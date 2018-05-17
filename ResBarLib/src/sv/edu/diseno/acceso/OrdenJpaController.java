@@ -36,29 +36,12 @@ public class OrdenJpaController implements Serializable {
     }
 
     public void create(Orden orden) throws PreexistingEntityException, Exception {
-        if (orden.getDetalleOrdenList() == null) {
-            orden.setDetalleOrdenList(new ArrayList<DetalleOrden>());
-        }
+        
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<DetalleOrden> attachedDetalleOrdenList = new ArrayList<DetalleOrden>();
-            for (DetalleOrden detalleOrdenListDetalleOrdenToAttach : orden.getDetalleOrdenList()) {
-                detalleOrdenListDetalleOrdenToAttach = em.getReference(detalleOrdenListDetalleOrdenToAttach.getClass(), detalleOrdenListDetalleOrdenToAttach.getDetalleOrdenPK());
-                attachedDetalleOrdenList.add(detalleOrdenListDetalleOrdenToAttach);
-            }
-            orden.setDetalleOrdenList(attachedDetalleOrdenList);
             em.persist(orden);
-            for (DetalleOrden detalleOrdenListDetalleOrden : orden.getDetalleOrdenList()) {
-                Orden oldOrdenOfDetalleOrdenListDetalleOrden = detalleOrdenListDetalleOrden.getOrden();
-                detalleOrdenListDetalleOrden.setOrden(orden);
-                detalleOrdenListDetalleOrden = em.merge(detalleOrdenListDetalleOrden);
-                if (oldOrdenOfDetalleOrdenListDetalleOrden != null) {
-                    oldOrdenOfDetalleOrdenListDetalleOrden.getDetalleOrdenList().remove(detalleOrdenListDetalleOrden);
-                    oldOrdenOfDetalleOrdenListDetalleOrden = em.merge(oldOrdenOfDetalleOrdenListDetalleOrden);
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findOrden(orden.getIdOrden()) != null) {
@@ -77,40 +60,7 @@ public class OrdenJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Orden persistentOrden = em.find(Orden.class, orden.getIdOrden());
-            List<DetalleOrden> detalleOrdenListOld = persistentOrden.getDetalleOrdenList();
-            List<DetalleOrden> detalleOrdenListNew = orden.getDetalleOrdenList();
-            List<String> illegalOrphanMessages = null;
-            for (DetalleOrden detalleOrdenListOldDetalleOrden : detalleOrdenListOld) {
-                if (!detalleOrdenListNew.contains(detalleOrdenListOldDetalleOrden)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain DetalleOrden " + detalleOrdenListOldDetalleOrden + " since its orden field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<DetalleOrden> attachedDetalleOrdenListNew = new ArrayList<DetalleOrden>();
-            for (DetalleOrden detalleOrdenListNewDetalleOrdenToAttach : detalleOrdenListNew) {
-                detalleOrdenListNewDetalleOrdenToAttach = em.getReference(detalleOrdenListNewDetalleOrdenToAttach.getClass(), detalleOrdenListNewDetalleOrdenToAttach.getDetalleOrdenPK());
-                attachedDetalleOrdenListNew.add(detalleOrdenListNewDetalleOrdenToAttach);
-            }
-            detalleOrdenListNew = attachedDetalleOrdenListNew;
-            orden.setDetalleOrdenList(detalleOrdenListNew);
             orden = em.merge(orden);
-            for (DetalleOrden detalleOrdenListNewDetalleOrden : detalleOrdenListNew) {
-                if (!detalleOrdenListOld.contains(detalleOrdenListNewDetalleOrden)) {
-                    Orden oldOrdenOfDetalleOrdenListNewDetalleOrden = detalleOrdenListNewDetalleOrden.getOrden();
-                    detalleOrdenListNewDetalleOrden.setOrden(orden);
-                    detalleOrdenListNewDetalleOrden = em.merge(detalleOrdenListNewDetalleOrden);
-                    if (oldOrdenOfDetalleOrdenListNewDetalleOrden != null && !oldOrdenOfDetalleOrdenListNewDetalleOrden.equals(orden)) {
-                        oldOrdenOfDetalleOrdenListNewDetalleOrden.getDetalleOrdenList().remove(detalleOrdenListNewDetalleOrden);
-                        oldOrdenOfDetalleOrdenListNewDetalleOrden = em.merge(oldOrdenOfDetalleOrdenListNewDetalleOrden);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -128,30 +78,13 @@ public class OrdenJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Orden orden) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Orden orden;
-            try {
-                orden = em.getReference(Orden.class, id);
-                orden.getIdOrden();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The orden with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<DetalleOrden> detalleOrdenListOrphanCheck = orden.getDetalleOrdenList();
-            for (DetalleOrden detalleOrdenListOrphanCheckDetalleOrden : detalleOrdenListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Orden (" + orden + ") cannot be destroyed since the DetalleOrden " + detalleOrdenListOrphanCheckDetalleOrden + " in its detalleOrdenList field has a non-nullable orden field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            em.remove(orden);
+            Orden or = orden;
+            em.remove(or);
             em.getTransaction().commit();
         } finally {
             if (em != null) {

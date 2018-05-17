@@ -36,34 +36,11 @@ public class DetalleOrdenJpaController implements Serializable {
     }
 
     public void create(DetalleOrden detalleOrden) throws PreexistingEntityException, Exception {
-        if (detalleOrden.getDetalleOrdenPK() == null) {
-            detalleOrden.setDetalleOrdenPK(new DetalleOrdenPK());
-        }
-        detalleOrden.getDetalleOrdenPK().setIdProducto(detalleOrden.getProducto().getIdProducto());
-        detalleOrden.getDetalleOrdenPK().setIdOrden(detalleOrden.getOrden().getIdOrden());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Orden orden = detalleOrden.getOrden();
-            if (orden != null) {
-                orden = em.getReference(orden.getClass(), orden.getIdOrden());
-                detalleOrden.setOrden(orden);
-            }
-            Producto producto = detalleOrden.getProducto();
-            if (producto != null) {
-                producto = em.getReference(producto.getClass(), producto.getIdProducto());
-                detalleOrden.setProducto(producto);
-            }
             em.persist(detalleOrden);
-            if (orden != null) {
-                orden.getDetalleOrdenList().add(detalleOrden);
-                orden = em.merge(orden);
-            }
-            if (producto != null) {
-                producto.getDetalleOrdenList().add(detalleOrden);
-                producto = em.merge(producto);
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findDetalleOrden(detalleOrden.getDetalleOrdenPK()) != null) {
@@ -78,42 +55,12 @@ public class DetalleOrdenJpaController implements Serializable {
     }
 
     public void edit(DetalleOrden detalleOrden) throws NonexistentEntityException, Exception {
-        detalleOrden.getDetalleOrdenPK().setIdProducto(detalleOrden.getProducto().getIdProducto());
-        detalleOrden.getDetalleOrdenPK().setIdOrden(detalleOrden.getOrden().getIdOrden());
+       
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            DetalleOrden persistentDetalleOrden = em.find(DetalleOrden.class, detalleOrden.getDetalleOrdenPK());
-            Orden ordenOld = persistentDetalleOrden.getOrden();
-            Orden ordenNew = detalleOrden.getOrden();
-            Producto productoOld = persistentDetalleOrden.getProducto();
-            Producto productoNew = detalleOrden.getProducto();
-            if (ordenNew != null) {
-                ordenNew = em.getReference(ordenNew.getClass(), ordenNew.getIdOrden());
-                detalleOrden.setOrden(ordenNew);
-            }
-            if (productoNew != null) {
-                productoNew = em.getReference(productoNew.getClass(), productoNew.getIdProducto());
-                detalleOrden.setProducto(productoNew);
-            }
             detalleOrden = em.merge(detalleOrden);
-            if (ordenOld != null && !ordenOld.equals(ordenNew)) {
-                ordenOld.getDetalleOrdenList().remove(detalleOrden);
-                ordenOld = em.merge(ordenOld);
-            }
-            if (ordenNew != null && !ordenNew.equals(ordenOld)) {
-                ordenNew.getDetalleOrdenList().add(detalleOrden);
-                ordenNew = em.merge(ordenNew);
-            }
-            if (productoOld != null && !productoOld.equals(productoNew)) {
-                productoOld.getDetalleOrdenList().remove(detalleOrden);
-                productoOld = em.merge(productoOld);
-            }
-            if (productoNew != null && !productoNew.equals(productoOld)) {
-                productoNew.getDetalleOrdenList().add(detalleOrden);
-                productoNew = em.merge(productoNew);
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -131,29 +78,13 @@ public class DetalleOrdenJpaController implements Serializable {
         }
     }
 
-    public void destroy(DetalleOrdenPK id) throws NonexistentEntityException {
+     public void destroy(DetalleOrden detalleOrden) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            DetalleOrden detalleOrden;
-            try {
-                detalleOrden = em.getReference(DetalleOrden.class, id);
-                detalleOrden.getDetalleOrdenPK();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The detalleOrden with id " + id + " no longer exists.", enfe);
-            }
-            Orden orden = detalleOrden.getOrden();
-            if (orden != null) {
-                orden.getDetalleOrdenList().remove(detalleOrden);
-                orden = em.merge(orden);
-            }
-            Producto producto = detalleOrden.getProducto();
-            if (producto != null) {
-                producto.getDetalleOrdenList().remove(detalleOrden);
-                producto = em.merge(producto);
-            }
-            em.remove(detalleOrden);
+            DetalleOrden detOrd = detalleOrden;
+            em.remove(detOrd);
             em.getTransaction().commit();
         } finally {
             if (em != null) {

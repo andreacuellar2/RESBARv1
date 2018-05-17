@@ -43,22 +43,9 @@ public class CategoriaJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Producto> attachedProductoList = new ArrayList<Producto>();
-            for (Producto productoListProductoToAttach : categoria.getProductoList()) {
-                productoListProductoToAttach = em.getReference(productoListProductoToAttach.getClass(), productoListProductoToAttach.getIdProducto());
-                attachedProductoList.add(productoListProductoToAttach);
-            }
-            categoria.setProductoList(attachedProductoList);
+           
             em.persist(categoria);
-            for (Producto productoListProducto : categoria.getProductoList()) {
-                Categoria oldIdCategoriaOfProductoListProducto = productoListProducto.getIdCategoria();
-                productoListProducto.setIdCategoria(categoria);
-                productoListProducto = em.merge(productoListProducto);
-                if (oldIdCategoriaOfProductoListProducto != null) {
-                    oldIdCategoriaOfProductoListProducto.getProductoList().remove(productoListProducto);
-                    oldIdCategoriaOfProductoListProducto = em.merge(oldIdCategoriaOfProductoListProducto);
-                }
-            }
+           
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (findCategoria(categoria.getIdCategoria()) != null) {
@@ -77,40 +64,7 @@ public class CategoriaJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Categoria persistentCategoria = em.find(Categoria.class, categoria.getIdCategoria());
-            List<Producto> productoListOld = persistentCategoria.getProductoList();
-            List<Producto> productoListNew = categoria.getProductoList();
-            List<String> illegalOrphanMessages = null;
-            for (Producto productoListOldProducto : productoListOld) {
-                if (!productoListNew.contains(productoListOldProducto)) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("You must retain Producto " + productoListOldProducto + " since its idCategoria field is not nullable.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            List<Producto> attachedProductoListNew = new ArrayList<Producto>();
-            for (Producto productoListNewProductoToAttach : productoListNew) {
-                productoListNewProductoToAttach = em.getReference(productoListNewProductoToAttach.getClass(), productoListNewProductoToAttach.getIdProducto());
-                attachedProductoListNew.add(productoListNewProductoToAttach);
-            }
-            productoListNew = attachedProductoListNew;
-            categoria.setProductoList(productoListNew);
             categoria = em.merge(categoria);
-            for (Producto productoListNewProducto : productoListNew) {
-                if (!productoListOld.contains(productoListNewProducto)) {
-                    Categoria oldIdCategoriaOfProductoListNewProducto = productoListNewProducto.getIdCategoria();
-                    productoListNewProducto.setIdCategoria(categoria);
-                    productoListNewProducto = em.merge(productoListNewProducto);
-                    if (oldIdCategoriaOfProductoListNewProducto != null && !oldIdCategoriaOfProductoListNewProducto.equals(categoria)) {
-                        oldIdCategoriaOfProductoListNewProducto.getProductoList().remove(productoListNewProducto);
-                        oldIdCategoriaOfProductoListNewProducto = em.merge(oldIdCategoriaOfProductoListNewProducto);
-                    }
-                }
-            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -128,30 +82,13 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws IllegalOrphanException, NonexistentEntityException {
+    public void destroy(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Categoria categoria;
-            try {
-                categoria = em.getReference(Categoria.class, id);
-                categoria.getIdCategoria();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The categoria with id " + id + " no longer exists.", enfe);
-            }
-            List<String> illegalOrphanMessages = null;
-            List<Producto> productoListOrphanCheck = categoria.getProductoList();
-            for (Producto productoListOrphanCheckProducto : productoListOrphanCheck) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("This Categoria (" + categoria + ") cannot be destroyed since the Producto " + productoListOrphanCheckProducto + " in its productoList field has a non-nullable idCategoria field.");
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
-            em.remove(categoria);
+            Categoria cat = categoria;
+            em.remove(cat);
             em.getTransaction().commit();
         } finally {
             if (em != null) {

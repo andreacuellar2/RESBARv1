@@ -74,19 +74,13 @@ public class ParametroJpaController implements Serializable {
         }
     }
 
-    public void destroy(Integer id) throws NonexistentEntityException {
+    public void destroy(Parametro parametro) throws NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Parametro parametro;
-            try {
-                parametro = em.getReference(Parametro.class, id);
-                parametro.getIdParametro();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The parametro with id " + id + " no longer exists.", enfe);
-            }
-            em.remove(parametro);
+            Parametro para = parametro;
+            em.remove(para);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
