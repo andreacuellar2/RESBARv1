@@ -5,7 +5,7 @@
  */
 package sv.edu.diseno.acceso.main;
 
-import sv.edu.diseno.acceso.CategoriaJpaController;
+import sv.edu.diseno.acceso.ManejadorCategorias;
 import sv.edu.diseno.definiciones.Categoria;
 
 /**
@@ -15,10 +15,10 @@ import sv.edu.diseno.definiciones.Categoria;
 public class Main{
   
     public static void main(String[] args) throws Exception{
-        CategoriaJpaController cjc = new CategoriaJpaController();
+        ManejadorCategorias cjc = new ManejadorCategorias();
         Categoria cat = new Categoria(6, "Categoria 6");
-        cjc.create(cat);
-        System.out.println(cjc.findCategoria(6).toString());
+        cjc.Insertar(cat);
+        System.out.println(cjc.ObtenerId(6).toString());
         
     }
     
