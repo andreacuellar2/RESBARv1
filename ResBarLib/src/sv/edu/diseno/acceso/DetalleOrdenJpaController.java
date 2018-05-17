@@ -10,15 +10,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import sv.edu.diseno.acceso.exceptions.NonexistentEntityException;
 import sv.edu.diseno.acceso.exceptions.PreexistingEntityException;
 import sv.edu.diseno.definiciones.DetalleOrden;
 import sv.edu.diseno.definiciones.DetalleOrdenPK;
-import sv.edu.diseno.definiciones.Orden;
-import sv.edu.diseno.definiciones.Producto;
 
 /**
  *

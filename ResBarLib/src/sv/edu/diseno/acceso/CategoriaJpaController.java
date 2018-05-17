@@ -7,11 +7,8 @@ package sv.edu.diseno.acceso;
 
 import java.io.Serializable;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import sv.edu.diseno.definiciones.Producto;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -25,20 +22,12 @@ import sv.edu.diseno.definiciones.Categoria;
  * @author LuisEnrique
  */
 public class CategoriaJpaController implements Serializable {
-
-    public CategoriaJpaController(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
+    static EntityManagerProvider emp = new EntityManagerProvider();
+    public static EntityManager getEntityManager() {
+        return  emp.deliverEM();
     }
 
-    public void create(Categoria categoria) throws PreexistingEntityException, Exception {
-        if (categoria.getProductoList() == null) {
-            categoria.setProductoList(new ArrayList<Producto>());
-        }
+    public static void create(Categoria categoria) throws PreexistingEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -59,7 +48,7 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public void edit(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public static void edit(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -82,7 +71,7 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public void destroy(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
+    public static void destroy(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -97,15 +86,15 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public List<Categoria> findCategoriaEntities() {
+    public static List<Categoria> findCategoriaEntities() {
         return findCategoriaEntities(true, -1, -1);
     }
 
-    public List<Categoria> findCategoriaEntities(int maxResults, int firstResult) {
+    public static List<Categoria> findCategoriaEntities(int maxResults, int firstResult) {
         return findCategoriaEntities(false, maxResults, firstResult);
     }
 
-    private List<Categoria> findCategoriaEntities(boolean all, int maxResults, int firstResult) {
+    private static List<Categoria> findCategoriaEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
@@ -121,7 +110,7 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public Categoria findCategoria(Integer id) {
+    public static Categoria findCategoria(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Categoria.class, id);
@@ -130,7 +119,7 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public int getCategoriaCount() {
+    public static int getCategoriaCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
