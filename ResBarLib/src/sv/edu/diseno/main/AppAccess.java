@@ -8,7 +8,7 @@ package sv.edu.diseno.main;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import sv.edu.diseno.acceso.CategoriaJpaController;
+import sv.edu.diseno.acceso.ManejadorCategorias;
 import sv.edu.diseno.definiciones.Categoria;
 
 /**
@@ -20,13 +20,13 @@ public class AppAccess {
         
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ResBarLibPU");
         
-        CategoriaJpaController controller = new CategoriaJpaController(emf);
+        ManejadorCategorias controller = new ManejadorCategorias(emf);
         
-        List<Categoria> categorias = controller.findCategoriaEntities();
+       // List<Categoria> categorias = controller.Obtener(true);
         
-        categorias.forEach((c) -> {
-            System.out.println(c.getIdCategoria()+"\t"+c.getNombre());
-        });
+      //  categorias.forEach((c) -> {
+       //     System.out.println(c.getIdCategoria()+"\t"+c.getNombre());
+       // });
         
     }
     

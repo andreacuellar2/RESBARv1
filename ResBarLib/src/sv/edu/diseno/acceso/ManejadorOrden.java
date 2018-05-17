@@ -6,24 +6,27 @@
 package sv.edu.diseno.acceso;
 
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import sv.edu.diseno.definiciones.DetalleOrden;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import sv.edu.diseno.acceso.exceptions.IllegalOrphanException;
 import sv.edu.diseno.acceso.exceptions.NonexistentEntityException;
 import sv.edu.diseno.acceso.exceptions.PreexistingEntityException;
-import sv.edu.diseno.definiciones.Parametro;
+import sv.edu.diseno.definiciones.Orden;
 
 /**
  *
  * @author LuisEnrique
  */
-public class ParametroJpaController implements Serializable {
+public class ManejadorOrden implements Serializable {
 
-    public ParametroJpaController(EntityManagerFactory emf) {
+    public ManejadorOrden(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -32,16 +35,17 @@ public class ParametroJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Parametro parametro) throws PreexistingEntityException, Exception {
+    public void create(Orden orden) throws PreexistingEntityException, Exception {
+        
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(parametro);
+            em.persist(orden);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findParametro(parametro.getIdParametro()) != null) {
-                throw new PreexistingEntityException("Parametro " + parametro + " already exists.", ex);
+            if (findOrden(orden.getIdOrden()) != null) {
+                throw new PreexistingEntityException("Orden " + orden + " already exists.", ex);
             }
             throw ex;
         } finally {
@@ -51,19 +55,19 @@ public class ParametroJpaController implements Serializable {
         }
     }
 
-    public void edit(Parametro parametro) throws NonexistentEntityException, Exception {
+    public void edit(Orden orden) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            parametro = em.merge(parametro);
+            orden = em.merge(orden);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = parametro.getIdParametro();
-                if (findParametro(id) == null) {
-                    throw new NonexistentEntityException("The parametro with id " + id + " no longer exists.");
+                Integer id = orden.getIdOrden();
+                if (findOrden(id) == null) {
+                    throw new NonexistentEntityException("The orden with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -74,13 +78,13 @@ public class ParametroJpaController implements Serializable {
         }
     }
 
-    public void destroy(Parametro parametro) throws NonexistentEntityException {
+    public void destroy(Orden orden) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Parametro para = parametro;
-            em.remove(para);
+            Orden or = orden;
+            em.remove(or);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -89,19 +93,19 @@ public class ParametroJpaController implements Serializable {
         }
     }
 
-    public List<Parametro> findParametroEntities() {
-        return findParametroEntities(true, -1, -1);
+    public List<Orden> findOrdenEntities() {
+        return findOrdenEntities(true, -1, -1);
     }
 
-    public List<Parametro> findParametroEntities(int maxResults, int firstResult) {
-        return findParametroEntities(false, maxResults, firstResult);
+    public List<Orden> findOrdenEntities(int maxResults, int firstResult) {
+        return findOrdenEntities(false, maxResults, firstResult);
     }
 
-    private List<Parametro> findParametroEntities(boolean all, int maxResults, int firstResult) {
+    private List<Orden> findOrdenEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Parametro.class));
+            cq.select(cq.from(Orden.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -113,20 +117,20 @@ public class ParametroJpaController implements Serializable {
         }
     }
 
-    public Parametro findParametro(Integer id) {
+    public Orden findOrden(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Parametro.class, id);
+            return em.find(Orden.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getParametroCount() {
+    public int getOrdenCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Parametro> rt = cq.from(Parametro.class);
+            Root<Orden> rt = cq.from(Orden.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

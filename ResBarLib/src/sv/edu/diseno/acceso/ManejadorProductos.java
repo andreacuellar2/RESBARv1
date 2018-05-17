@@ -25,9 +25,9 @@ import sv.edu.diseno.definiciones.Producto;
  *
  * @author LuisEnrique
  */
-public class ProductoJpaController implements Serializable {
+public class ManejadorProductos implements Serializable {
 
-    public ProductoJpaController(EntityManagerFactory emf) {
+    public ManejadorProductos(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -36,7 +36,7 @@ public class ProductoJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Producto producto) throws PreexistingEntityException, Exception {
+    public void Insertar(Producto producto) throws PreexistingEntityException, Exception {
         if (producto.getDetalleOrdenList() == null) {
             producto.setDetalleOrdenList(new ArrayList<DetalleOrden>());
         }
@@ -47,8 +47,8 @@ public class ProductoJpaController implements Serializable {
             em.persist(producto);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findProducto(producto.getIdProducto()) != null) {
-                throw new PreexistingEntityException("Producto " + producto + " already exists.", ex);
+            if (ObtenerId(producto.getIdProducto()) != null) {
+                throw new PreexistingEntityException("El produto '"+producto+"' ya existe", ex);
             }
             throw ex;
         } finally {
@@ -58,7 +58,7 @@ public class ProductoJpaController implements Serializable {
         }
     }
 
-    public void edit(Producto producto) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void Actualizar(Producto producto) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -68,8 +68,8 @@ public class ProductoJpaController implements Serializable {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = producto.getIdProducto();
-                if (findProducto(id) == null) {
-                    throw new NonexistentEntityException("The producto with id " + id + " no longer exists.");
+                if (ObtenerId(id) == null) {
+                    throw new NonexistentEntityException("El producto con el ID '"+ id + "' ya no existe");
                 }
             }
             throw ex;
@@ -80,7 +80,7 @@ public class ProductoJpaController implements Serializable {
         }
     }
 
-    public void destroy(Producto producto) throws IllegalOrphanException, NonexistentEntityException {
+    public void Eliminar(Producto producto) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -95,15 +95,8 @@ public class ProductoJpaController implements Serializable {
         }
     }
 
-    public List<Producto> findProductoEntities() {
-        return findProductoEntities(true, -1, -1);
-    }
-
-    public List<Producto> findProductoEntities(int maxResults, int firstResult) {
-        return findProductoEntities(false, maxResults, firstResult);
-    }
-
-    private List<Producto> findProductoEntities(boolean all, int maxResults, int firstResult) {
+    //MODIFICARLO
+    private List<Producto> Obtener(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
@@ -119,7 +112,7 @@ public class ProductoJpaController implements Serializable {
         }
     }
 
-    public Producto findProducto(Integer id) {
+    public Producto ObtenerId(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Producto.class, id);
@@ -127,18 +120,6 @@ public class ProductoJpaController implements Serializable {
             em.close();
         }
     }
-
-    public int getProductoCount() {
-        EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Producto> rt = cq.from(Producto.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
-        } finally {
-            em.close();
-        }
-    }
     
+    //FALTA EL DE OBTENER POR CATEGORIA
 }

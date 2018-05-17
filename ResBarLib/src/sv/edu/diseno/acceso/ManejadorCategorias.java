@@ -24,9 +24,9 @@ import sv.edu.diseno.definiciones.Categoria;
  *
  * @author LuisEnrique
  */
-public class CategoriaJpaController implements Serializable {
+public class ManejadorCategorias implements Serializable {
 
-    public CategoriaJpaController(EntityManagerFactory emf) {
+    public ManejadorCategorias(EntityManagerFactory emf) {
         this.emf = emf;
     }
     private EntityManagerFactory emf = null;
@@ -35,7 +35,7 @@ public class CategoriaJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Categoria categoria) throws PreexistingEntityException, Exception {
+    public void Insertar(Categoria categoria) throws PreexistingEntityException, Exception {
         if (categoria.getProductoList() == null) {
             categoria.setProductoList(new ArrayList<Producto>());
         }
@@ -48,8 +48,8 @@ public class CategoriaJpaController implements Serializable {
            
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findCategoria(categoria.getIdCategoria()) != null) {
-                throw new PreexistingEntityException("Categoria " + categoria + " already exists.", ex);
+            if (ObtenerId(categoria.getIdCategoria()) != null) {
+                throw new PreexistingEntityException("La categoría: " + categoria + " ya existe", ex);
             }
             throw ex;
         } finally {
@@ -59,7 +59,7 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public void edit(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void Actualizar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -70,8 +70,8 @@ public class CategoriaJpaController implements Serializable {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = categoria.getIdCategoria();
-                if (findCategoria(id) == null) {
-                    throw new NonexistentEntityException("The categoria with id " + id + " no longer exists.");
+                if (ObtenerId(id) == null) {
+                    throw new NonexistentEntityException("La categoría con el ID " + id + " ya no existe");
                 }
             }
             throw ex;
@@ -82,7 +82,7 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public void destroy(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
+    public void Eliminar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -97,47 +97,24 @@ public class CategoriaJpaController implements Serializable {
         }
     }
 
-    public List<Categoria> findCategoriaEntities() {
-        return findCategoriaEntities(true, -1, -1);
-    }
-
-    public List<Categoria> findCategoriaEntities(int maxResults, int firstResult) {
-        return findCategoriaEntities(false, maxResults, firstResult);
-    }
-
-    private List<Categoria> findCategoriaEntities(boolean all, int maxResults, int firstResult) {
+    //ESTE MÉTODO FALTA MODIFICARLO CON LO DE LOS SUBPRODUCTOS
+    private List<Categoria> Obtener(boolean subProductos ) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
             cq.select(cq.from(Categoria.class));
             Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
+
             return q.getResultList();
         } finally {
             em.close();
         }
     }
 
-    public Categoria findCategoria(Integer id) {
+    public Categoria ObtenerId(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Categoria.class, id);
-        } finally {
-            em.close();
-        }
-    }
-
-    public int getCategoriaCount() {
-        EntityManager em = getEntityManager();
-        try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Categoria> rt = cq.from(Categoria.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
         } finally {
             em.close();
         }
