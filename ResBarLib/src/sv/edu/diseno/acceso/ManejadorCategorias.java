@@ -15,34 +15,41 @@ import javax.persistence.EntityManagerFactory;
 import sv.edu.diseno.acceso.exceptions.IllegalOrphanException;
 import sv.edu.diseno.acceso.exceptions.NonexistentEntityException;
 import sv.edu.diseno.acceso.exceptions.PreexistingEntityException;
-import sv.edu.diseno.definiciones.Orden;
+import sv.edu.diseno.definiciones.Categoria;
 
 /**
  *
  * @author LuisEnrique
  */
-public class OrdenJpaController implements Serializable {
 
-    public OrdenJpaController(EntityManagerFactory emf) {
-        this.emf = emf;
+
+    
+
+    
+public class ManejadorCategorias implements Serializable {
+
+    static EntityManagerProvider emp = new EntityManagerProvider();
+    public static EntityManager getEntityManager() {
+        return  emp.deliverEM();
     }
+    
+   
     private EntityManagerFactory emf = null;
 
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
-    }
-
-    public void create(Orden orden) throws PreexistingEntityException, Exception {
+        public void Insertar(Categoria categoria) throws PreexistingEntityException, Exception {
         
+
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(orden);
+           
+            em.persist(categoria);
+           
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (findOrden(orden.getIdOrden()) != null) {
-                throw new PreexistingEntityException("Orden " + orden + " already exists.", ex);
+            if (ObtenerId(categoria.getIdCategoria()) != null) {
+                throw new PreexistingEntityException("La categoría: " + categoria + " ya existe", ex);
             }
             throw ex;
         } finally {
@@ -52,19 +59,21 @@ public class OrdenJpaController implements Serializable {
         }
     }
 
-    public void edit(Orden orden) throws IllegalOrphanException, NonexistentEntityException, Exception {
+
+    public void Actualizar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
+
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            orden = em.merge(orden);
+            categoria = em.merge(categoria);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = orden.getIdOrden();
-                if (findOrden(id) == null) {
-                    throw new NonexistentEntityException("The orden with id " + id + " no longer exists.");
+                Integer id = categoria.getIdCategoria();
+                if (ObtenerId(id) == null) {
+                    throw new NonexistentEntityException("La categoría con el ID " + id + " ya no existe");
                 }
             }
             throw ex;
@@ -75,13 +84,15 @@ public class OrdenJpaController implements Serializable {
         }
     }
 
-    public void destroy(Orden orden) throws IllegalOrphanException, NonexistentEntityException {
+
+    public void Eliminar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
+
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Orden or = orden;
-            em.remove(or);
+            Categoria cat = categoria;
+            em.remove(cat);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -90,47 +101,26 @@ public class OrdenJpaController implements Serializable {
         }
     }
 
-    public List<Orden> findOrdenEntities() {
-        return findOrdenEntities(true, -1, -1);
-    }
 
-    public List<Orden> findOrdenEntities(int maxResults, int firstResult) {
-        return findOrdenEntities(false, maxResults, firstResult);
-    }
-
-    private List<Orden> findOrdenEntities(boolean all, int maxResults, int firstResult) {
+    //ESTE MÉTODO FALTA MODIFICARLO CON LO DE LOS SUBPRODUCTOS
+    private List<Categoria> Obtener(boolean subProductos ) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Orden.class));
+            cq.select(cq.from(Categoria.class));
             Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
+
             return q.getResultList();
         } finally {
             em.close();
         }
     }
 
-    public Orden findOrden(Integer id) {
-        EntityManager em = getEntityManager();
-        try {
-            return em.find(Orden.class, id);
-        } finally {
-            em.close();
-        }
-    }
 
-    public int getOrdenCount() {
+    public Categoria ObtenerId(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Orden> rt = cq.from(Orden.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
+            return em.find(Categoria.class, id);
         } finally {
             em.close();
         }
