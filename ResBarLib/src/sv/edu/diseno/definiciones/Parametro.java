@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sv.edu.diseno;
+package sv.edu.diseno.definiciones;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
