@@ -21,31 +21,21 @@ import sv.edu.diseno.definiciones.Categoria;
  *
  * @author LuisEnrique
  */
+public class ManejadorCategorias extends EntityManagerProvider implements Serializable {
 
-
-    
-
-    
-public class ManejadorCategorias implements Serializable {
-
-    static EntityManagerProvider emp = new EntityManagerProvider();
+//    static EntityManagerProvider emp = new EntityManagerProvider();
     public static EntityManager getEntityManager() {
-        return  emp.deliverEM();
+        return deliverEM();
     }
-    
-   
-    private EntityManagerFactory emf = null;
 
-        public void Insertar(Categoria categoria) throws PreexistingEntityException, Exception {
-        
-
+    public void Insertar(Categoria categoria) throws PreexistingEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-           
+
             em.persist(categoria);
-           
+
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (ObtenerId(categoria.getIdCategoria()) != null) {
@@ -58,7 +48,6 @@ public class ManejadorCategorias implements Serializable {
             }
         }
     }
-
 
     public void Actualizar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
 
@@ -84,7 +73,6 @@ public class ManejadorCategorias implements Serializable {
         }
     }
 
-
     public void Eliminar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
 
         EntityManager em = null;
@@ -101,21 +89,25 @@ public class ManejadorCategorias implements Serializable {
         }
     }
 
-
     //ESTE MÉTODO FALTA MODIFICARLO CON LO DE LOS SUBPRODUCTOS
-    private List<Categoria> Obtener(boolean subProductos ) {
+    private List<Categoria> Obtener(boolean subProductos) {
         EntityManager em = getEntityManager();
         try {
+            if(subProductos){
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
             cq.select(cq.from(Categoria.class));
             Query q = em.createQuery(cq);
-
             return q.getResultList();
+            }else{
+            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            cq.select(cq.from(Categoria.class).get("idCategoria").get("nombre"));
+            Query q = em.createQuery(cq);
+            return q.getResultList();    
+            }
         } finally {
             em.close();
         }
     }
-
 
     public Categoria ObtenerId(Integer id) {
         EntityManager em = getEntityManager();
@@ -125,5 +117,5 @@ public class ManejadorCategorias implements Serializable {
             em.close();
         }
     }
-    
+
 }
