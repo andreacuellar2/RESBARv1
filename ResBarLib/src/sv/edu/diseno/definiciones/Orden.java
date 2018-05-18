@@ -31,12 +31,15 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "Orden", catalog = "resbar", schema = "")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o")
+    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o WHERE o.estado = TRUE")
+    , @NamedQuery(name = "Orden.findAllActivasTxt", query = "SELECT o FROM Orden o WHERE o.cliente LIKE :cliente OR o.mesero LIKE :mesero OR o.mesa LIKE :mesa OR o.comentario LIKE :comentario")
+    , @NamedQuery(name = "Orden.findAllByIdOrdenDesc", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")
     , @NamedQuery(name = "Orden.findByIdOrden", query = "SELECT o FROM Orden o WHERE o.idOrden = :idOrden")
     , @NamedQuery(name = "Orden.findByMesero", query = "SELECT o FROM Orden o WHERE o.mesero = :mesero")
     , @NamedQuery(name = "Orden.findByMesa", query = "SELECT o FROM Orden o WHERE o.mesa = :mesa")
     , @NamedQuery(name = "Orden.findByCliente", query = "SELECT o FROM Orden o WHERE o.cliente = :cliente")
     , @NamedQuery(name = "Orden.findByFecha", query = "SELECT o FROM Orden o WHERE o.fecha = :fecha")
+    , @NamedQuery(name = "Orden.findByFechaString", query = "SELECT o FROM Orden o WHERE o.fecha LIKE :fecha")
     , @NamedQuery(name = "Orden.findByComentario", query = "SELECT o FROM Orden o WHERE o.comentario = :comentario")
     , @NamedQuery(name = "Orden.findByTotal", query = "SELECT o FROM Orden o WHERE o.total = :total")
     , @NamedQuery(name = "Orden.findByEstado", query = "SELECT o FROM Orden o WHERE o.estado = :estado")})

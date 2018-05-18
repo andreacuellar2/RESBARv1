@@ -6,6 +6,7 @@
 package sv.edu.diseno.acceso;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -21,18 +22,12 @@ import sv.edu.diseno.definiciones.Orden;
  *
  * @author LuisEnrique
  */
-public class ManejadorOrden implements Serializable {
+public class ManejadorOrden extends EntityManagerProvider implements Serializable {
 
-    public ManejadorOrden(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
+       
     private EntityManagerFactory emf = null;
 
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
-    }
-
-    public void create(Orden orden) throws PreexistingEntityException, Exception {
+    public static void Insertar(Orden orden) throws PreexistingEntityException, Exception {
         
         EntityManager em = null;
         try {
@@ -52,7 +47,7 @@ public class ManejadorOrden implements Serializable {
         }
     }
 
-    public void edit(Orden orden) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public static void Actualizar(Orden orden) throws IllegalOrphanException, NonexistentEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -75,7 +70,7 @@ public class ManejadorOrden implements Serializable {
         }
     }
 
-    public void destroy(Orden orden) throws IllegalOrphanException, NonexistentEntityException {
+    public static void Eliminar(Orden orden) throws IllegalOrphanException, NonexistentEntityException {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -90,31 +85,32 @@ public class ManejadorOrden implements Serializable {
         }
     }
 
-    public List<Orden> findOrdenEntities() {
-        return findOrdenEntities(true, -1, -1);
-    }
 
-    public List<Orden> findOrdenEntities(int maxResults, int firstResult) {
-        return findOrdenEntities(false, maxResults, firstResult);
-    }
-
-    private List<Orden> findOrdenEntities(boolean all, int maxResults, int firstResult) {
+    public static List<Orden> ObtenerActivas() {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Orden.class));
-            Query q = em.createQuery(cq);
-            if (!all) {
-                q.setMaxResults(maxResults);
-                q.setFirstResult(firstResult);
-            }
+            Query q = em.createNamedQuery("Orden.findAll");
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public static List<Orden> BuscarActivas(String txt){
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Orden.findAllActivasTxt");
+            q.setParameter("cliente", "%"+txt+"%");
+            q.setParameter("mesero", "%"+txt+"%");
+            q.setParameter("mesa", "%"+txt+"%");
+            q.setParameter("comentario", "%"+txt+"%");
             return q.getResultList();
         } finally {
             em.close();
         }
     }
 
-    public Orden findOrden(Integer id) {
+    public static Orden findOrden(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Orden.class, id);
@@ -123,14 +119,23 @@ public class ManejadorOrden implements Serializable {
         }
     }
 
-    public int getOrdenCount() {
+    public static int ObtenerId() {
+        EntityManager em = getEntityManager();
+        try {            
+            Query q = em.createNamedQuery("Orden.findAllByIdOrdenDesc");
+            q.setMaxResults(1);            
+            return ((Integer) q.getSingleResult()+1);
+        } finally {
+            em.close();
+        }
+    }
+    
+    public static List<Orden> ObtenerVentas(Date date){
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Orden> rt = cq.from(Orden.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue();
+            Query q = em.createNamedQuery("Orden.findByFecha");
+            q.setParameter("fecha", date);
+            return q.getResultList();
         } finally {
             em.close();
         }

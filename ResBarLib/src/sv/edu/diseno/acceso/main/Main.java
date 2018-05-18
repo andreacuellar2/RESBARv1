@@ -7,6 +7,7 @@ package sv.edu.diseno.acceso.main;
 
 import java.util.List;
 import sv.edu.diseno.acceso.ManejadorCategorias;
+import sv.edu.diseno.acceso.ManejadorOrden;
 import sv.edu.diseno.acceso.ManejadorParametros;
 import sv.edu.diseno.definiciones.Categoria;
 import sv.edu.diseno.definiciones.Parametro;
@@ -20,18 +21,10 @@ public class Main{
   
     public static void main(String[] args) throws Exception{
         ManejadorCategorias cjc = new ManejadorCategorias();
-        ManejadorParametros mjp = new ManejadorParametros();
-        List<Categoria> listaconsub = cjc.Obtener(true);
-        List<Categoria> listasinsub = cjc.Obtener(false);
-        for (Categoria categoria : listaconsub) {
-            List<Producto> produc = categoria.getProductoList();
-            for (Producto producto : produc) {
-                System.out.println(producto.getNombre());
-            }
-        }
-        for (Categoria categoria : listasinsub) {
-            System.out.println(categoria.getProductoList());
-        }
+        ManejadorOrden mo = new ManejadorOrden();
+        
+        System.out.println(mo.ObtenerActivas());
+        
     }
     
 }

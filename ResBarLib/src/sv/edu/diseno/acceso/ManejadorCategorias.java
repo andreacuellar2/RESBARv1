@@ -104,10 +104,12 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
 
-    public Categoria ObtenerId(Integer id) {
+    public int ObtenerId() {
         EntityManager em = getEntityManager();
-        try {
-            return em.find(Categoria.class, id);
+        try {            
+            Query q = em.createNamedQuery("Categoria.findAllByIdOrdenDesc");
+            q.setMaxResults(1);            
+            return ((Integer) q.getSingleResult()+1);
         } finally {
             em.close();
         }
