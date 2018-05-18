@@ -6,12 +6,11 @@
 package sv.edu.diseno.acceso;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import sv.edu.diseno.acceso.exceptions.IllegalOrphanException;
 import sv.edu.diseno.acceso.exceptions.NonexistentEntityException;
 import sv.edu.diseno.acceso.exceptions.PreexistingEntityException;
@@ -23,12 +22,10 @@ import sv.edu.diseno.definiciones.Categoria;
  */
 public class ManejadorCategorias extends EntityManagerProvider implements Serializable {
 
-//    static EntityManagerProvider emp = new EntityManagerProvider();
-    public static EntityManager getEntityManager() {
-        return deliverEM();
-    }
 
-    public void Insertar(Categoria categoria) throws PreexistingEntityException, Exception {
+    
+
+    public static void Insertar(Categoria categoria) throws PreexistingEntityException, Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -38,9 +35,6 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
 
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (ObtenerId(categoria.getIdCategoria()) != null) {
-                throw new PreexistingEntityException("La categoría: " + categoria + " ya existe", ex);
-            }
             throw ex;
         } finally {
             if (em != null) {
@@ -49,7 +43,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
 
-    public void Actualizar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public static void Actualizar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException, Exception {
 
         EntityManager em = null;
         try {
@@ -61,9 +55,6 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = categoria.getIdCategoria();
-                if (ObtenerId(id) == null) {
-                    throw new NonexistentEntityException("La categoría con el ID " + id + " ya no existe");
-                }
             }
             throw ex;
         } finally {
@@ -73,7 +64,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
 
-    public void Eliminar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
+    public static void Eliminar(Categoria categoria) throws IllegalOrphanException, NonexistentEntityException {
 
         EntityManager em = null;
         try {
@@ -90,7 +81,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
     }
 
     //ESTE MÉTODO FALTA MODIFICARLO CON LO DE LOS SUBPRODUCTOS
-    private List<Categoria> Obtener(boolean subProductos) {
+    public static List<Categoria> Obtener(boolean subProductos) {
         EntityManager em = getEntityManager();
         try {
             if(subProductos){
@@ -100,9 +91,13 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
             return q.getResultList();
             }else{
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Categoria.class).get("idCategoria").get("nombre"));
+            cq.select(cq.from(Categoria.class));
             Query q = em.createQuery(cq);
-            return q.getResultList();    
+            List<Categoria> lista = q.getResultList();
+                for (Categoria categoria : lista) {
+                    categoria.setProductoList(new ArrayList<>());
+                }
+                return lista;
             }
         } finally {
             em.close();

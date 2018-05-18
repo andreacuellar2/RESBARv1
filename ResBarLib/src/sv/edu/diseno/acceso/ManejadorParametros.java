@@ -19,9 +19,7 @@ import sv.edu.diseno.definiciones.Parametro;
  */
 public class ManejadorParametros extends EntityManagerProvider implements Serializable {
 
-    public static EntityManager getEntityManager() {
-        return deliverEM();
-    }
+ 
 
     public static void Actualizar(Parametro parametro) throws NonexistentEntityException, Exception {
         EntityManager em = null;
@@ -48,7 +46,7 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
 
     //MODIFICAR
     //se modifico para devolver todos los resultados sin un limite
-    private static List<Parametro> Obtener() {
+    public static List<Parametro> Obtener() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();

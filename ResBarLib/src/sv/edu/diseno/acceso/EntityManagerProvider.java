@@ -17,7 +17,7 @@ public class EntityManagerProvider {
  
     private final static String puName="ResBarLibPU";
     
-    public static EntityManager deliverEM(){
+    public static EntityManager getEntityManager(){
        EntityManagerFactory emf = Persistence.createEntityManagerFactory(puName);
        return emf.createEntityManager();
     }
