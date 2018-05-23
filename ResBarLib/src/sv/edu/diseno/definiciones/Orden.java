@@ -35,6 +35,8 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Orden.findAllActivas", query = "SELECT o FROM Orden o WHERE o.activa = TRUE")
     , @NamedQuery(name = "Orden.findAllActivasText", query = "SELECT o FROM Orden o WHERE (o.activa = TRUE) AND (o.cliente LIKE :cliente OR o.mesero LIKE :mesero OR o.mesa LIKE :mesa OR o.comentario LIKE :comentario)")
     , @NamedQuery(name = "Orden.findAllActivasByIdOrden", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")
+    , @NamedQuery(name = "Orden.findByFechaLike", query = "SELECT o FROM Orden o WHERE o.fecha LIKE :fecha")
+    , @NamedQuery(name = "Orden.findByFechaBetWeen", query = "SELECT o FROM Orden o WHERE o.fecha BETWEEN :fecha1 AND :fecha2")
     , @NamedQuery(name = "Orden.findByIdOrden", query = "SELECT o FROM Orden o WHERE o.idOrden = :idOrden")
     , @NamedQuery(name = "Orden.findByMesero", query = "SELECT o FROM Orden o WHERE o.mesero = :mesero")
     , @NamedQuery(name = "Orden.findByMesa", query = "SELECT o FROM Orden o WHERE o.mesa = :mesa")

@@ -26,7 +26,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
 //    *Eliminar(o: orden)
 //    *ObtenerId(): integer
 //    ObtenerVentas(:Date): Orden[]
-//    ObtenerVentas(:Date;Date): Orden[]
+//    *ObtenerVentas(:Date;Date): Orden[]
     
     public static List<Orden> ObtenerActivas() {
         EntityManager em = getEntityManager();
@@ -137,8 +137,23 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
     public static List<Orden> ObtenerVentas(Date date) {
         EntityManager em = getEntityManager();
         try {
-            Query q = em.createNamedQuery("Orden.findByFecha");
-            q.setParameter("fecha", date);
+            Query q = em.createNamedQuery("Orden.findByFechaBetWeen");
+            Date date1 = new Date(date.getYear(), date.getMonth(), date.getDay(), 0, 0, 0);
+            Date date2 = new Date(date.getYear(), date.getMonth(), date.getDay(), 23, 59, 59);
+            q.setParameter("fecha1", date1);
+            q.setParameter("fecha2", date2);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public static List<Orden> ObtenerVentas(Date date1, Date date2) {
+        EntityManager em = getEntityManager();
+        try {
+            Query q = em.createNamedQuery("Orden.findByFechaBetWeen");
+            q.setParameter("fecha1", date1);
+            q.setParameter("fecha2", date2);
             return q.getResultList();
         } finally {
             em.close();
