@@ -19,18 +19,20 @@ import sv.edu.diseno.excepciones.ErrorAplicacion;
  * @author LuisEnrique
  */
 public class ManejadorParametros extends EntityManagerProvider implements Serializable {
-    
-    public static List<Parametro> Obtener() {
+
+    public static List<Parametro> Obtener() throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
             cq.select(cq.from(Parametro.class));
             Query q = em.createQuery(cq);
             return q.getResultList();
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorParametros.Obtener()$Fallo al obtener parámetros" + ex.getMessage());
         } finally {
             em.close();
         }
-    } 
+    }
 
     public static void Actualizar(Parametro parametro) throws ErrorAplicacion {
         EntityManager em = null;
@@ -44,24 +46,26 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
             if (msg == null || msg.length() == 0) {
                 Integer id = parametro.idParametro;
                 if (em.find(Parametro.class, id) == null) {
-                    throw new ErrorAplicacion("El parámetro con el ID '"+id+"' ya no existe");
+                    throw new ErrorAplicacion("El parámetro con el ID '" + id + "' ya no existe");
                 }
             }
-            throw new ErrorAplicacion(ex.toString());
+            throw new ErrorAplicacion("ManejadorParametros.Actualizar(:Parametro)$Fallo al actualizar parámetros" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
             }
         }
     }
-    
-    public static Parametro Obtener(int idParametro) {
+
+    public static Parametro Obtener(int idParametro) throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             return em.find(Parametro.class, idParametro);
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorParametros.Obtener(:int)$Fallo al obtener parámetro por id" + ex.getMessage());
         } finally {
             em.close();
         }
     }
-    
+
 }
