@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `resbar`.`Orden` (
   `fecha` DATETIME NOT NULL,
   `comentario` VARCHAR(350) NULL,
   `total` DECIMAL(10,4) NOT NULL,
-  `estado` TINYINT(1) NOT NULL,
+  `activa` TINYINT(1) NOT NULL,
   PRIMARY KEY (`idOrden`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8

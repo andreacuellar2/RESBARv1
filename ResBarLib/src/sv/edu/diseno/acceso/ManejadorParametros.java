@@ -5,12 +5,12 @@
  */
 package sv.edu.diseno.acceso;
 
+import sv.edu.diseno.provider.EntityManagerProvider;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
-import sv.edu.diseno.acceso.exceptions.NonexistentEntityException;
 import sv.edu.diseno.definiciones.Parametro;
 
 /**
@@ -21,7 +21,7 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
 
  
 
-    public static void Actualizar(Parametro parametro) throws NonexistentEntityException, Exception {
+    public static void Actualizar(Parametro parametro) throws Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -33,7 +33,7 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
             if (msg == null || msg.length() == 0) {
                 Integer id = parametro.getIdParametro();
                 if (em.find(Parametro.class, id) == null) {
-                    throw new NonexistentEntityException("El parámetro con el ID '"+id+"' ya no existe");
+                    throw new Exception("El parámetro con el ID '"+id+"' ya no existe");
                 }
             }
             throw ex;

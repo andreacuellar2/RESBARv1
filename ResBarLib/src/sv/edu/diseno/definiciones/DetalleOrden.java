@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author andrea
+ * @author jcpleitez
  */
 @Entity
 @Table(name = "DetalleOrden", catalog = "resbar", schema = "")
@@ -116,7 +116,7 @@ public class DetalleOrden implements Serializable {
 
     @Override
     public String toString() {
-        return "sv.edu.diseno.DetalleOrden[ detalleOrdenPK=" + detalleOrdenPK + " ]";
+        return "sv.edu.diseno.definiciones.DetalleOrden[ detalleOrdenPK=" + detalleOrdenPK + " ]";
     }
     
 }

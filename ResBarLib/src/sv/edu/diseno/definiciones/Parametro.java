@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author andrea
+ * @author jcpleitez
  */
 @Entity
 @Table(name = "Parametro", catalog = "resbar", schema = "")
@@ -100,7 +100,7 @@ public class Parametro implements Serializable {
 
     @Override
     public String toString() {
-        return "sv.edu.diseno.Parametro[ idParametro=" + idParametro + " ]";
+        return "sv.edu.diseno.definiciones.Parametro[ idParametro=" + idParametro + " ]";
     }
     
 }

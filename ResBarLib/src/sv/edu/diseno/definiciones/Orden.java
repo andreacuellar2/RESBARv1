@@ -25,24 +25,24 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author andrea
+ * @author jcpleitez
  */
 @Entity
 @Table(name = "Orden", catalog = "resbar", schema = "")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o WHERE o.estado = TRUE")
-    , @NamedQuery(name = "Orden.findAllActivasTxt", query = "SELECT o FROM Orden o WHERE o.cliente LIKE :cliente OR o.mesero LIKE :mesero OR o.mesa LIKE :mesa OR o.comentario LIKE :comentario")
-    , @NamedQuery(name = "Orden.findAllByIdOrdenDesc", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")
+    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o")
+    , @NamedQuery(name = "Orden.findAllActivas", query = "SELECT o FROM Orden o WHERE o.activa = TRUE")
+    , @NamedQuery(name = "Orden.findAllActivasText", query = "SELECT o FROM Orden o WHERE (o.activa = TRUE) AND (o.cliente LIKE :cliente OR o.mesero LIKE :mesero OR o.mesa LIKE :mesa OR o.comentario LIKE :comentario)")
+    , @NamedQuery(name = "Orden.findAllActivasByIdOrden", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")
     , @NamedQuery(name = "Orden.findByIdOrden", query = "SELECT o FROM Orden o WHERE o.idOrden = :idOrden")
     , @NamedQuery(name = "Orden.findByMesero", query = "SELECT o FROM Orden o WHERE o.mesero = :mesero")
     , @NamedQuery(name = "Orden.findByMesa", query = "SELECT o FROM Orden o WHERE o.mesa = :mesa")
     , @NamedQuery(name = "Orden.findByCliente", query = "SELECT o FROM Orden o WHERE o.cliente = :cliente")
     , @NamedQuery(name = "Orden.findByFecha", query = "SELECT o FROM Orden o WHERE o.fecha = :fecha")
-    , @NamedQuery(name = "Orden.findByFechaString", query = "SELECT o FROM Orden o WHERE o.fecha LIKE :fecha")
     , @NamedQuery(name = "Orden.findByComentario", query = "SELECT o FROM Orden o WHERE o.comentario = :comentario")
     , @NamedQuery(name = "Orden.findByTotal", query = "SELECT o FROM Orden o WHERE o.total = :total")
-    , @NamedQuery(name = "Orden.findByEstado", query = "SELECT o FROM Orden o WHERE o.estado = :estado")})
+    , @NamedQuery(name = "Orden.findByActiva", query = "SELECT o FROM Orden o WHERE o.activa = :activa")})
 public class Orden implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -70,8 +70,8 @@ public class Orden implements Serializable {
     @Column(name = "total")
     private BigDecimal total;
     @Basic(optional = false)
-    @Column(name = "estado")
-    private boolean estado;
+    @Column(name = "activa")
+    private boolean activa;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     private List<DetalleOrden> detalleOrdenList;
 
@@ -82,14 +82,14 @@ public class Orden implements Serializable {
         this.idOrden = idOrden;
     }
 
-    public Orden(Integer idOrden, String mesero, String mesa, String cliente, Date fecha, BigDecimal total, boolean estado) {
+    public Orden(Integer idOrden, String mesero, String mesa, String cliente, Date fecha, BigDecimal total, boolean activa) {
         this.idOrden = idOrden;
         this.mesero = mesero;
         this.mesa = mesa;
         this.cliente = cliente;
         this.fecha = fecha;
         this.total = total;
-        this.estado = estado;
+        this.activa = activa;
     }
 
     public Integer getIdOrden() {
@@ -148,12 +148,12 @@ public class Orden implements Serializable {
         this.total = total;
     }
 
-    public boolean getEstado() {
-        return estado;
+    public boolean getActiva() {
+        return activa;
     }
 
-    public void setEstado(boolean estado) {
-        this.estado = estado;
+    public void setActiva(boolean activa) {
+        this.activa = activa;
     }
 
     @XmlTransient
@@ -187,7 +187,7 @@ public class Orden implements Serializable {
 
     @Override
     public String toString() {
-        return "sv.edu.diseno.Orden[ idOrden=" + idOrden + " ]";
+        return "sv.edu.diseno.definiciones.Orden[ idOrden=" + idOrden + " ]";
     }
     
 }

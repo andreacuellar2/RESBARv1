@@ -12,7 +12,7 @@ import javax.persistence.Embeddable;
 
 /**
  *
- * @author andrea
+ * @author jcpleitez
  */
 @Embeddable
 public class DetalleOrdenPK implements Serializable {
@@ -74,7 +74,7 @@ public class DetalleOrdenPK implements Serializable {
 
     @Override
     public String toString() {
-        return "sv.edu.diseno.DetalleOrdenPK[ idOrden=" + idOrden + ", idProducto=" + idProducto + " ]";
+        return "sv.edu.diseno.definiciones.DetalleOrdenPK[ idOrden=" + idOrden + ", idProducto=" + idProducto + " ]";
     }
     
 }

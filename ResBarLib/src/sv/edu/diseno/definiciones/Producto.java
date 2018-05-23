@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author andrea
+ * @author jcpleitez
  */
 @Entity
 @Table(name = "Producto", catalog = "resbar", schema = "")
@@ -32,10 +32,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Producto.findAll", query = "SELECT p FROM Producto p")
     , @NamedQuery(name = "Producto.findByIdProducto", query = "SELECT p FROM Producto p WHERE p.idProducto = :idProducto")
-    , @NamedQuery(name = "Producto.findByIdCategoria", query = "SELECT p FROM Producto p WHERE p.idCategoria= :idCategoria")
     , @NamedQuery(name = "Producto.findByNombre", query = "SELECT p FROM Producto p WHERE p.nombre = :nombre")
     , @NamedQuery(name = "Producto.findByPrecio", query = "SELECT p FROM Producto p WHERE p.precio = :precio")
-    , @NamedQuery(name = "Producto.findByNombreLike", query = "SELECT DISTINCT p FROM Producto p WHERE UPPER(p.nombre) LIKE UPPER(:nombre)")
     , @NamedQuery(name = "Producto.findByArea", query = "SELECT p FROM Producto p WHERE p.area = :area")})
 public class Producto implements Serializable {
 
@@ -145,7 +143,7 @@ public class Producto implements Serializable {
 
     @Override
     public String toString() {
-        return "sv.edu.diseno.Producto[ idProducto=" + idProducto + " ]";
+        return "sv.edu.diseno.definiciones.Producto[ idProducto=" + idProducto + " ]";
     }
     
 }

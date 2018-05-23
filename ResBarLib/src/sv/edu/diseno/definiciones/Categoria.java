@@ -21,17 +21,15 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author andrea
+ * @author jcpleitez
  */
 @Entity
 @Table(name = "Categoria", catalog = "resbar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Categoria.findAll", query = "SELECT c FROM Categoria c")
-    , @NamedQuery(name = "Categoria.findAllByIdOrdenDesc", query = "SELECT o.idCategoria FROM Categoria o ORDER BY o.idCategoria DESC")
     , @NamedQuery(name = "Categoria.findByIdCategoria", query = "SELECT c FROM Categoria c WHERE c.idCategoria = :idCategoria")
-    , @NamedQuery(name = "Categoria.findByNombre", query = "SELECT c FROM Categoria c WHERE c.nombre = :nombre")
-    , @NamedQuery(name = "Categoria.findSinProductos", query = "SELECT c.idCategoria, c.nombre FROM Categoria AS c ")})
+    , @NamedQuery(name = "Categoria.findByNombre", query = "SELECT c FROM Categoria c WHERE c.nombre = :nombre")})
 public class Categoria implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -104,7 +102,7 @@ public class Categoria implements Serializable {
 
     @Override
     public String toString() {
-        return "sv.edu.diseno.Categoria[ idCategoria=" + idCategoria + " ]";
+        return "sv.edu.diseno.definiciones.Categoria[ idCategoria=" + idCategoria + " ]";
     }
     
 }

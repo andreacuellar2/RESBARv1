@@ -11,34 +11,21 @@ import sv.edu.diseno.definiciones.DetalleOrden;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import sv.edu.diseno.acceso.exceptions.IllegalOrphanException;
-import sv.edu.diseno.acceso.exceptions.NonexistentEntityException;
-import sv.edu.diseno.acceso.exceptions.PreexistingEntityException;
-import sv.edu.diseno.definiciones.Orden;
 import sv.edu.diseno.definiciones.Producto;
+import sv.edu.diseno.provider.EntityManagerProvider;
 
 /**
  *
  * @author LuisEnrique
  */
-public class ManejadorProductos implements Serializable {
-
-    public ManejadorProductos(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-    private EntityManagerFactory emf = null;
-
-    public EntityManager getEntityManager() {
-        return emf.createEntityManager();
-    }
+public class ManejadorProductos extends EntityManagerProvider implements Serializable {
     
     
     public List<Producto> ObtenerPorCategoria(String categoria){
         if (categoria != null) {
-            Query q = this.getEntityManager().createNamedQuery("Producto.findByIdCategoria");
+            Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
             q.setParameter("idCategoria", "%" + categoria + "%");
             List lista = q.getResultList();
             return lista;
@@ -49,7 +36,7 @@ public class ManejadorProductos implements Serializable {
     
     public List<Producto> Buscar(String producto){
         if (producto != null) {
-            Query q = this.getEntityManager().createNamedQuery("Producto.findByNombreLike");
+            Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
             q.setParameter("nombre", "%" + producto + "%");
             List lista = q.getResultList();
             return lista;
@@ -58,7 +45,7 @@ public class ManejadorProductos implements Serializable {
         
     }
 
-    public void Insertar(Producto producto) throws PreexistingEntityException, Exception {
+    public void Insertar(Producto producto) throws Exception {
         if (producto.getDetalleOrdenList() == null) {
             producto.setDetalleOrdenList(new ArrayList<DetalleOrden>());
         }
@@ -70,7 +57,7 @@ public class ManejadorProductos implements Serializable {
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (Obtener(producto.getIdProducto()) != null) {
-                throw new PreexistingEntityException("El produto '"+producto+"' ya existe", ex);
+                throw new Exception("El produto '"+producto+"' ya existe", ex);
             }
             throw ex;
         } finally {
@@ -80,7 +67,7 @@ public class ManejadorProductos implements Serializable {
         }
     }
 
-    public void Actualizar(Producto producto) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void Actualizar(Producto producto) throws Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -91,7 +78,7 @@ public class ManejadorProductos implements Serializable {
             if (msg == null || msg.length() == 0) {
                 Integer id = producto.getIdProducto();
                 if (Obtener(id) == null) {
-                    throw new NonexistentEntityException("El producto con el ID '"+ id + "' ya no existe");
+                    throw new Exception("El producto con el ID '"+ id + "' ya no existe");
                 }
             }
             throw ex;
@@ -102,7 +89,7 @@ public class ManejadorProductos implements Serializable {
         }
     }
 
-    public void Eliminar(Producto producto) throws IllegalOrphanException, NonexistentEntityException {
+    public void Eliminar(Producto producto) {
         EntityManager em = null;
         try {
             em = getEntityManager();

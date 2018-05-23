@@ -6,12 +6,9 @@
 package sv.edu.diseno.acceso.main;
 
 import java.util.List;
-import sv.edu.diseno.acceso.ManejadorCategorias;
 import sv.edu.diseno.acceso.ManejadorOrden;
-import sv.edu.diseno.acceso.ManejadorParametros;
-import sv.edu.diseno.definiciones.Categoria;
-import sv.edu.diseno.definiciones.Parametro;
-import sv.edu.diseno.definiciones.Producto;
+import sv.edu.diseno.definiciones.Orden;
+
 
 /**
  *
@@ -20,10 +17,14 @@ import sv.edu.diseno.definiciones.Producto;
 public class Main{
   
     public static void main(String[] args) throws Exception{
-        ManejadorCategorias cjc = new ManejadorCategorias();
+        
         ManejadorOrden mo = new ManejadorOrden();
         
-        System.out.println(mo.ObtenerActivas());
+        List<Orden> lista = mo.ObtenerActivas();
+        
+        lista.forEach((orden) -> {
+            System.out.println(orden.getCliente());
+        });
         
     }
     
