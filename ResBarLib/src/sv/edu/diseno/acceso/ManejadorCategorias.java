@@ -21,12 +21,6 @@ import sv.edu.diseno.excepciones.ErrorAplicacion;
  */
 public class ManejadorCategorias extends EntityManagerProvider implements Serializable {
     
-    //Obtener(:boolean): categoria[]
-    //Actualizar(c: categoria)
-    //Insertar(c: categoria)
-    //Eliminar(c: categoria)
-    //ObtenerId(): integer 
-    
     public static List<Categoria> Obtener(boolean subProductos) {
         EntityManager em = getEntityManager();
         try {

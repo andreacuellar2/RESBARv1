@@ -20,20 +20,20 @@ import sv.edu.diseno.excepciones.ErrorAplicacion;
  */
 public class ManejadorOrden extends EntityManagerProvider implements Serializable {
     
-//    *ObtenerActivas(): Orden[]
-//    *Actualizar(o: orden)
-//    *BuscarActivas(:string):Orden[]
-//    *Insertar(:orden)
-//    *Eliminar(o: orden)
-//    *ObtenerId(): integer
-//    ObtenerVentas(:Date): Orden[]
-//    *ObtenerVentas(:Date;Date): Orden[]
-    
     public static List<Orden> ObtenerActivas() {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Orden.findAllActivas");
             return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public static Orden Obtener(int idOrden){
+        EntityManager em = getEntityManager();
+        try {
+            return em.find(Orden.class, idOrden);
         } finally {
             em.close();
         }

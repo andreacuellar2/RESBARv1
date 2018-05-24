@@ -20,15 +20,6 @@ import sv.edu.diseno.provider.EntityManagerProvider;
  * @author LuisEnrique
  */
 public class ManejadorProductos extends EntityManagerProvider implements Serializable {
-
-    
-//ObtenerxCategoria(IdCat:integer): Producto[]
-//Buscar(:String): Producto[]
-//Inserar(p: producto)
-//Actualizar(p: producto)
-//Eliminar(p: producto)
-//Obtener(:integer): producto
-//ObtenerID():integer
     
     public List<Producto> ObtenerxCategoria(int IdCat){
         Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
