@@ -75,4 +75,39 @@ public class Orden implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     public List<DetalleOrden> detalleOrdenList;
    
+    public void CalcularTotal(){
+      BigDecimal totalCalculado = null;
+        for (DetalleOrden detalleOrden : detalleOrdenList) {
+            totalCalculado = totalCalculado.add(detalleOrden.cantidad.multiply(detalleOrden.producto.precio));
+        }
+      this.total = totalCalculado;
+    }
+    
+    public void AgregarProducto(Producto producto, BigDecimal cant){
+        for (DetalleOrden detalleOrden : detalleOrdenList) {
+            if (producto == detalleOrden.producto) {
+               detalleOrden.cantidad = detalleOrden.cantidad.add(cant);
+            }else{
+                DetalleOrden nuevo = new DetalleOrden();
+                nuevo.producto = producto;
+                nuevo.cantidad = cant;
+                detalleOrdenList.add(nuevo);
+            }           
+        }
+        CalcularTotal();
+    }
+    
+    public void EliminarProducto(Producto producto, BigDecimal cant){
+        for (DetalleOrden detalleOrden : detalleOrdenList) {
+            if (producto == detalleOrden.producto) {
+               detalleOrden.cantidad =  detalleOrden.cantidad.subtract(cant);
+               if(detalleOrden.cantidad.intValue()<=0){
+                detalleOrdenList.remove(detalleOrden);
+               }
+               
+            }
+        }
+        CalcularTotal();
+    }
+    
 }
