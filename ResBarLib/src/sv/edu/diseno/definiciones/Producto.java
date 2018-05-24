@@ -52,13 +52,21 @@ public class Producto implements Serializable {
     @Basic(optional = false)
     @Column(name = "precio")
     public BigDecimal precio;
+
+    /**
+     * tendrá un valor C si el producto debe prepararse en cocina y B si el producto debe prepararse en el área de bebidas.
+     */
     @Basic(optional = false)
     @Column(name = "area")
     public Character area;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "producto")
     public List<DetalleOrden> detalleOrdenList;
+
+    /**
+     * esta propiedad tendrá un objeto categoría, pero dicho objeto categoría No tendrá cargados los productos.
+     */
     @JoinColumn(name = "idCategoria", referencedColumnName = "idCategoria")
     @ManyToOne(optional = false)
-    public Categoria idCategoria;
+    public Categoria categoria;
     
 }

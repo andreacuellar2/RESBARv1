@@ -20,7 +20,13 @@ import sv.edu.diseno.excepciones.ErrorAplicacion;
  * @author LuisEnrique
  */
 public class ManejadorCategorias extends EntityManagerProvider implements Serializable {
+
     
+    /**
+     * Realiza una peticion a la base de datos y devuelve una coleccion de categorias.
+     * @param subProductos TRUE - Devuelve las categorias con sus productos FALSE - Devuelve las categorias sin sus productos
+     * @return Devuelve una coleccion de objetos categoria.
+     */
     public static List<Categoria> Obtener(boolean subProductos) {
         EntityManager em = getEntityManager();
         try {
@@ -35,7 +41,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
                 Query q = em.createQuery(cq);
                 List<Categoria> lista = q.getResultList();
                 for (Categoria categoria : lista) {
-                    categoria.productoList = new ArrayList<>();
+                    categoria.productos = new ArrayList<>();
                 }
                 return lista;
             }
@@ -44,6 +50,11 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }    
 
+    /**
+     * Actualiza los campos de una categoria, exceptuando su ID.
+     * @param categoria La categoria modificado.
+     * @throws ErrorAplicacion Si hay algun problema con la conexion a la base de datos o el elemento no existe.
+     */
     public static void Actualizar(Categoria categoria) throws ErrorAplicacion {
         EntityManager em = null;
         try {
@@ -64,6 +75,11 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
     
+    /**
+     * Agrega un nuevo objeto categoria a la base de datos.
+     * @param categoria Objeto categoria a agregar a la base de datos
+     * @throws ErrorAplicacion Si hay algun problema con la conexion a la base de datos o el elemento ya existe.
+     */
     public static void Insertar(Categoria categoria) throws ErrorAplicacion {
         EntityManager em = null;
         try {
@@ -80,6 +96,10 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
 
+    /**
+     * Elimina una categoria de la base de datos.
+     * @param categoria La categoria a eliminar.
+     */
     public static void Eliminar(Categoria categoria) {
 
         EntityManager em = null;
@@ -96,6 +116,10 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
 
+    /**
+     * Realiza una consulta a la base de datos para obtener el ultimo id de categoria y le suma uno
+     * @return Devuelve el proximo ID disponible para categoria.
+     */
     public Integer ObtenerId() {
         EntityManager em = getEntityManager();
         try {

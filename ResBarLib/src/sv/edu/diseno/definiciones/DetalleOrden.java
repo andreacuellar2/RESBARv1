@@ -41,7 +41,11 @@ public class DetalleOrden implements Serializable {
     public BigDecimal cantidad;
     @JoinColumn(name = "idOrden", referencedColumnName = "idOrden", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    public Orden orden;
+    protected Orden orden;
+
+    /**
+     * La propiedad producto tiene un objeto de la clase producto.
+     */
     @JoinColumn(name = "idProducto", referencedColumnName = "idProducto", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     public Producto producto;

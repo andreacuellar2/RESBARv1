@@ -21,21 +21,36 @@ import sv.edu.diseno.provider.EntityManagerProvider;
  */
 public class ManejadorProductos extends EntityManagerProvider implements Serializable {
     
-    public List<Producto> ObtenerxCategoria(int IdCat){
+    /**
+     * Busca productos por su categoria.
+     * @param IdCat Id de la categoria cuyos productos se quieren obtener 
+     * @return Devuelve una coleccion de objetos productos que se corresponden con el identificador de categoria que se paso como parametro
+     */
+    public static List<Producto> ObtenerxCategoria(int IdCat){
         Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
         q.setParameter("idCategoria", IdCat);
         List lista = q.getResultList();
         return lista;                
     }
     
-    public List<Producto> Buscar(String producto){
+    /**
+     * Busca productos por ID o Nombre segun un criterio de busqueda.
+     * @param producto Criterio de busqueda para ir a la base de datos y buscar todos los productos cuyo Id o nombre coincida con el criterio de búsqueda. 
+     * @return Devuelve la coleccion de productos, sin productos duplicados.
+     */
+    public static List<Producto> Buscar(String producto){
         Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
         q.setParameter("nombre", "%" + producto + "%");        
         List lista = q.getResultList();
         return lista;
     }
 
-    public void Insertar(Producto producto) throws ErrorAplicacion {
+    /**
+     * Agrega un nuevo objeto producto a la base de datos.
+     * @param producto Objeto producto a agregar a la base de datos
+     * @throws ErrorAplicacion Si hay algun problema con la conexion a la base de datos o el elemento ya existe.
+     */
+    public static void Insertar(Producto producto) throws ErrorAplicacion {
         if (producto.detalleOrdenList == null) {
             producto.detalleOrdenList =new ArrayList<DetalleOrden>();
         }
@@ -46,9 +61,6 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             em.persist(producto);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (Obtener(producto.idProducto) != null) {
-                throw new ErrorAplicacion("El produto '"+producto+"' ya existe"+ex);
-            }
             throw new ErrorAplicacion(ex.toString());
         } finally {
             if (em != null) {
@@ -57,19 +69,22 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
         }
     }
 
-    public void Actualizar(Producto producto) throws ErrorAplicacion {
+    /**
+     * Actualiza los campos de un producto, exceptuando su ID.
+     * @param producto el producto modificado.
+     * @throws ErrorAplicacion Si hay algun problema con la conexion a la base de datos o el elemento no existe.
+     */
+    public static void Actualizar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            producto = em.merge(producto);
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
                 Integer id = producto.idProducto;
-                if (Obtener(id) == null) {
-                    throw new ErrorAplicacion("El producto con el ID '"+ id + "' ya no existe");
-                }
             }
             throw new ErrorAplicacion(ex.toString());
         } finally {
@@ -78,8 +93,12 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             }
         }
     }
-
-    public void Eliminar(Producto producto) {
+    
+    /**
+     * Elimina un producto de la base de datos.
+     * @param producto El producto a eliminar.
+     */
+    public static void Eliminar(Producto producto) {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -94,7 +113,12 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
         }
     }
 
-    public Producto Obtener(Integer id) {
+    /**
+     * Realiza una peticion a la base de datos para obtener un producto por su id.
+     * @param id El id del producto que se desea obtener.
+     * @return Devuelve un objeto producto cuyo ID coincide con el valor del parametro.
+     */
+    public static Producto Obtener(Integer id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Producto.class, id);
@@ -103,7 +127,11 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
         }
     }    
     
-    public Integer ObtenerId() {
+    /**
+     * Realiza una consulta a la base de datos para obtener el ultimo id de producto y le suma uno
+     * @return Devuelve el proximo ID disponible para producto.
+     */
+    public static Integer ObtenerId() {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Producto.findAllByIdProducto");

@@ -20,6 +20,10 @@ import sv.edu.diseno.excepciones.ErrorAplicacion;
  */
 public class ManejadorParametros extends EntityManagerProvider implements Serializable {
     
+    /**
+     * Va a la base de datos y obtiene todos los parametros que están en dicha tabla.
+     * @return Devuelve una coleccion de objetos parametro
+     */
     public static List<Parametro> Obtener() {
         EntityManager em = getEntityManager();
         try {
@@ -32,6 +36,11 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
         }
     } 
 
+    /**
+     * Actualiza el campo valor de la tabla parametro
+     * @param parametro el parametro modificado
+     * @throws ErrorAplicacion Si hay algun problema con la conexion a la base de datos o el elemento no existe.
+     */
     public static void Actualizar(Parametro parametro) throws ErrorAplicacion {
         EntityManager em = null;
         try {
@@ -55,6 +64,11 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
         }
     }
     
+    /**
+     * Toma un id y busca en la base de datos el parametro que corresponda a ese id.
+     * @param idParametro El id del parametro que se desea buscar.
+     * @return Devuelve el parametro con el id correspondiente.
+     */
     public static Parametro Obtener(int idParametro) {
         EntityManager em = getEntityManager();
         try {
