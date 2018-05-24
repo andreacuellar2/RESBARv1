@@ -33,6 +33,9 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
     }
 
     public static Orden Obtener(int idOrden) throws ErrorAplicacion {
+        if (idOrden<0) {
+          throw new ErrorAplicacion("ManejadorOrden.Obtener()$Id no válido");  
+        }else{
         EntityManager em = getEntityManager();
         try {
             return em.find(Orden.class, idOrden);
@@ -41,6 +44,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         } finally {
             em.close();
         }
+    }
     }
 
     public static void Actualizar(Orden orden) throws ErrorAplicacion {
@@ -75,6 +79,9 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
     }
 
     public static List<Orden> BuscarActivas(String text) throws ErrorAplicacion {
+        if (text.isEmpty()) {
+            throw new ErrorAplicacion("ManejadorOrden.BuscarActivas(:String)$Texto ingresado es inválido");
+        }
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Orden.findAllActivasText");

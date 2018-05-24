@@ -58,6 +58,9 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
     }
 
     public static Parametro Obtener(int idParametro) throws ErrorAplicacion {
+        if (idParametro<0) {
+            throw new ErrorAplicacion("ManejadorParametros.Obtener(:int)$Fallo al obtener parámetro por id");
+        }
         EntityManager em = getEntityManager();
         try {
             return em.find(Parametro.class, idParametro);
