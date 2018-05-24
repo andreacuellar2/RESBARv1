@@ -11,9 +11,8 @@ import sv.edu.diseno.definiciones.DetalleOrden;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import sv.edu.diseno.definiciones.Producto;
+import sv.edu.diseno.excepciones.ErrorAplicacion;
 import sv.edu.diseno.provider.EntityManagerProvider;
 
 /**
@@ -21,31 +20,31 @@ import sv.edu.diseno.provider.EntityManagerProvider;
  * @author LuisEnrique
  */
 public class ManejadorProductos extends EntityManagerProvider implements Serializable {
+
     
+//ObtenerxCategoria(IdCat:integer): Producto[]
+//Buscar(:String): Producto[]
+//Inserar(p: producto)
+//Actualizar(p: producto)
+//Eliminar(p: producto)
+//Obtener(:integer): producto
+//ObtenerID():integer
     
-    public List<Producto> ObtenerPorCategoria(String categoria){
-        if (categoria != null) {
-            Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
-            q.setParameter("idCategoria", "%" + categoria + "%");
-            List lista = q.getResultList();
-            return lista;
-        }
-        return new ArrayList<>();
-        
+    public List<Producto> ObtenerxCategoria(int IdCat){
+        Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
+        q.setParameter("idCategoria", IdCat);
+        List lista = q.getResultList();
+        return lista;                
     }
     
     public List<Producto> Buscar(String producto){
-        if (producto != null) {
-            Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
-            q.setParameter("nombre", "%" + producto + "%");
-            List lista = q.getResultList();
-            return lista;
-        }
-        return new ArrayList<>();
-        
+        Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
+        q.setParameter("nombre", "%" + producto + "%");        
+        List lista = q.getResultList();
+        return lista;
     }
 
-    public void Insertar(Producto producto) throws Exception {
+    public void Insertar(Producto producto) throws ErrorAplicacion {
         if (producto.getDetalleOrdenList() == null) {
             producto.setDetalleOrdenList(new ArrayList<DetalleOrden>());
         }
@@ -57,9 +56,9 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             em.getTransaction().commit();
         } catch (Exception ex) {
             if (Obtener(producto.getIdProducto()) != null) {
-                throw new Exception("El produto '"+producto+"' ya existe", ex);
+                throw new ErrorAplicacion("El produto '"+producto+"' ya existe"+ex);
             }
-            throw ex;
+            throw new ErrorAplicacion(ex.toString());
         } finally {
             if (em != null) {
                 em.close();
@@ -67,7 +66,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
         }
     }
 
-    public void Actualizar(Producto producto) throws Exception {
+    public void Actualizar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -78,10 +77,10 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             if (msg == null || msg.length() == 0) {
                 Integer id = producto.getIdProducto();
                 if (Obtener(id) == null) {
-                    throw new Exception("El producto con el ID '"+ id + "' ya no existe");
+                    throw new ErrorAplicacion("El producto con el ID '"+ id + "' ya no existe");
                 }
             }
-            throw ex;
+            throw new ErrorAplicacion(ex.toString());
         } finally {
             if (em != null) {
                 em.close();
@@ -111,17 +110,14 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
         } finally {
             em.close();
         }
-    }
-    
+    }    
     
     public Integer ObtenerId() {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Producto> rt = cq.from(Producto.class);
-            cq.select(em.getCriteriaBuilder().count(rt));
-            Query q = em.createQuery(cq);
-            return ((Long) q.getSingleResult()).intValue() + 1;
+            Query q = em.createNamedQuery("Producto.findAllByIdProducto");
+            q.setMaxResults(1);
+            return ((Integer) q.getSingleResult() + 1);
         } finally {
             em.close();
         }

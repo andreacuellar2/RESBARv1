@@ -12,16 +12,27 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import sv.edu.diseno.definiciones.Parametro;
+import sv.edu.diseno.excepciones.ErrorAplicacion;
 
 /**
  *
  * @author LuisEnrique
  */
 public class ManejadorParametros extends EntityManagerProvider implements Serializable {
+    
+    public static List<Parametro> Obtener() {
+        EntityManager em = getEntityManager();
+        try {
+            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            cq.select(cq.from(Parametro.class));
+            Query q = em.createQuery(cq);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    } 
 
- 
-
-    public static void Actualizar(Parametro parametro) throws Exception {
+    public static void Actualizar(Parametro parametro) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -33,28 +44,24 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
             if (msg == null || msg.length() == 0) {
                 Integer id = parametro.getIdParametro();
                 if (em.find(Parametro.class, id) == null) {
-                    throw new Exception("El parámetro con el ID '"+id+"' ya no existe");
+                    throw new ErrorAplicacion("El parámetro con el ID '"+id+"' ya no existe");
                 }
             }
-            throw ex;
+            throw new ErrorAplicacion(ex.toString());
         } finally {
             if (em != null) {
                 em.close();
             }
         }
     }
-
-    //MODIFICAR
-    //se modifico para devolver todos los resultados sin un limite
-    public static List<Parametro> Obtener() {
+    
+    public static Parametro Obtener(int idParametro) {
         EntityManager em = getEntityManager();
         try {
-            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Parametro.class));
-            Query q = em.createQuery(cq);
-            return q.getResultList();
+            return em.find(Parametro.class, idParametro);
         } finally {
             em.close();
         }
     }
+    
 }

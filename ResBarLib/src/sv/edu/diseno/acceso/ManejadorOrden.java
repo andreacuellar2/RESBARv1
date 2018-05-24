@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import java.util.List;
 import javax.persistence.EntityManager;
 import sv.edu.diseno.definiciones.Orden;
+import sv.edu.diseno.excepciones.ErrorAplicacion;
 
 /**
  *
@@ -38,7 +39,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         }
     }
     
-    public static void Actualizar(Orden orden) throws Exception {
+    public static void Actualizar(Orden orden) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -58,7 +59,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
                 }
                 
                 if (findOrden == null) {
-                    throw new Exception("The orden with id " + id + " no longer exists.");
+                    throw new ErrorAplicacion("The orden with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -83,7 +84,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         }
     }
 
-    public static void Insertar(Orden orden) throws Exception {
+    public static void Insertar(Orden orden) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -98,7 +99,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
                 em.close();
             }
             if (findOrden != null) {
-                throw new Exception("Orden " + orden + " already exists.", ex);
+                throw new ErrorAplicacion("Orden " + orden + " already exists."+ex);
             }
             throw ex;
         } finally {
@@ -123,7 +124,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         }
     }
     
-    public static int ObtenerId() {
+    public static Integer ObtenerId() {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Orden.findAllActivasByIdOrden");
@@ -135,13 +136,10 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
     }
 
     public static List<Orden> ObtenerVentas(Date date) {
-        EntityManager em = getEntityManager();
+        EntityManager em = getEntityManager();        
         try {
-            Query q = em.createNamedQuery("Orden.findByFechaBetWeen");
-            Date date1 = new Date(date.getYear(), date.getMonth(), date.getDay(), 0, 0, 0);
-            Date date2 = new Date(date.getYear(), date.getMonth(), date.getDay(), 23, 59, 59);
-            q.setParameter("fecha1", date1);
-            q.setParameter("fecha2", date2);
+            Query q = em.createNamedQuery("Orden.findByFecha");            
+            q.setParameter("fecha", date);
             return q.getResultList();
         } finally {
             em.close();

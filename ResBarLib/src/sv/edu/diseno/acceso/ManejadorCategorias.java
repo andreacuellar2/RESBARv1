@@ -13,31 +13,44 @@ import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import javax.persistence.EntityManager;
 import sv.edu.diseno.definiciones.Categoria;
+import sv.edu.diseno.excepciones.ErrorAplicacion;
 
 /**
  *
  * @author LuisEnrique
  */
 public class ManejadorCategorias extends EntityManagerProvider implements Serializable {
-
-    public static void Insertar(Categoria categoria) throws Exception {
-        EntityManager em = null;
+    
+    //Obtener(:boolean): categoria[]
+    //Actualizar(c: categoria)
+    //Insertar(c: categoria)
+    //Eliminar(c: categoria)
+    //ObtenerId(): integer 
+    
+    public static List<Categoria> Obtener(boolean subProductos) {
+        EntityManager em = getEntityManager();
         try {
-            em = getEntityManager();
-            em.getTransaction().begin();
-            em.persist(categoria);
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            if (em != null) {
-                em.close();
+            if (subProductos) {
+                CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+                cq.select(cq.from(Categoria.class));
+                Query q = em.createQuery(cq);
+                return q.getResultList();
+            } else {
+                CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+                cq.select(cq.from(Categoria.class));
+                Query q = em.createQuery(cq);
+                List<Categoria> lista = q.getResultList();
+                for (Categoria categoria : lista) {
+                    categoria.setProductoList(new ArrayList<>());
+                }
+                return lista;
             }
+        } finally {
+            em.close();
         }
-    }
+    }    
 
-    public static void Actualizar(Categoria categoria) throws Exception {
-
+    public static void Actualizar(Categoria categoria) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -49,7 +62,23 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
             if (msg == null || msg.length() == 0) {
                 Integer id = categoria.getIdCategoria();
             }
-            throw ex;
+            throw new ErrorAplicacion(ex.toString());
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+    }
+    
+    public static void Insertar(Categoria categoria) throws ErrorAplicacion {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            em.persist(categoria);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            throw new ErrorAplicacion(ex.toString());
         } finally {
             if (em != null) {
                 em.close();
@@ -73,34 +102,10 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         }
     }
 
-    //ESTE MÉTODO FALTA MODIFICARLO CON LO DE LOS SUBPRODUCTOS
-    public static List<Categoria> Obtener(boolean subProductos) {
+    public Integer ObtenerId() {
         EntityManager em = getEntityManager();
         try {
-            if (subProductos) {
-                CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-                cq.select(cq.from(Categoria.class));
-                Query q = em.createQuery(cq);
-                return q.getResultList();
-            } else {
-                CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-                cq.select(cq.from(Categoria.class));
-                Query q = em.createQuery(cq);
-                List<Categoria> lista = q.getResultList();
-                for (Categoria categoria : lista) {
-                    categoria.setProductoList(new ArrayList<>());
-                }
-                return lista;
-            }
-        } finally {
-            em.close();
-        }
-    }
-
-    public int ObtenerId() {
-        EntityManager em = getEntityManager();
-        try {
-            Query q = em.createNamedQuery("Categoria.findAllByIdOrdenDesc");
+            Query q = em.createNamedQuery("Categoria.findAllByIdCategoria");
             q.setMaxResults(1);
             return ((Integer) q.getSingleResult() + 1);
         } finally {
