@@ -21,7 +21,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -50,145 +49,30 @@ public class Orden implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "idOrden")
-    private Integer idOrden;
+    public Integer idOrden;
     @Basic(optional = false)
     @Column(name = "mesero")
-    private String mesero;
+    public String mesero;
     @Basic(optional = false)
     @Column(name = "mesa")
-    private String mesa;
+    public String mesa;
     @Basic(optional = false)
     @Column(name = "cliente")
-    private String cliente;
+    public String cliente;
     @Basic(optional = false)
     @Column(name = "fecha")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
+    public Date fecha;
     @Column(name = "comentario")
-    private String comentario;
+    public String comentario;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @Column(name = "total")
-    private BigDecimal total;
+    public BigDecimal total;
     @Basic(optional = false)
     @Column(name = "activa")
-    private boolean activa;
+    public boolean activa;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
-    private List<DetalleOrden> detalleOrdenList;
-
-    public Orden() {
-    }
-
-    public Orden(Integer idOrden) {
-        this.idOrden = idOrden;
-    }
-
-    public Orden(Integer idOrden, String mesero, String mesa, String cliente, Date fecha, BigDecimal total, boolean activa) {
-        this.idOrden = idOrden;
-        this.mesero = mesero;
-        this.mesa = mesa;
-        this.cliente = cliente;
-        this.fecha = fecha;
-        this.total = total;
-        this.activa = activa;
-    }
-
-    public Integer getIdOrden() {
-        return idOrden;
-    }
-
-    public void setIdOrden(Integer idOrden) {
-        this.idOrden = idOrden;
-    }
-
-    public String getMesero() {
-        return mesero;
-    }
-
-    public void setMesero(String mesero) {
-        this.mesero = mesero;
-    }
-
-    public String getMesa() {
-        return mesa;
-    }
-
-    public void setMesa(String mesa) {
-        this.mesa = mesa;
-    }
-
-    public String getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(String cliente) {
-        this.cliente = cliente;
-    }
-
-    public Date getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public boolean getActiva() {
-        return activa;
-    }
-
-    public void setActiva(boolean activa) {
-        this.activa = activa;
-    }
-
-    @XmlTransient
-    public List<DetalleOrden> getDetalleOrdenList() {
-        return detalleOrdenList;
-    }
-
-    public void setDetalleOrdenList(List<DetalleOrden> detalleOrdenList) {
-        this.detalleOrdenList = detalleOrdenList;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idOrden != null ? idOrden.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Orden)) {
-            return false;
-        }
-        Orden other = (Orden) object;
-        if ((this.idOrden == null && other.idOrden != null) || (this.idOrden != null && !this.idOrden.equals(other.idOrden))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "sv.edu.diseno.definiciones.Orden[ idOrden=" + idOrden + " ]";
-    }
-    
+    public List<DetalleOrden> detalleOrdenList;
+   
 }

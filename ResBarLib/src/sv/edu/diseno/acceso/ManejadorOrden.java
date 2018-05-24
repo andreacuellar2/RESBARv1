@@ -49,7 +49,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = orden.getIdOrden();
+                Integer id = orden.idOrden;
                 
                 Orden findOrden = null;
                 try {
@@ -94,7 +94,7 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         } catch (Exception ex) {
             Orden findOrden = null;
             try {
-                findOrden = em.find(Orden.class, orden.getIdOrden());
+                findOrden = em.find(Orden.class, orden.idOrden);
             } finally {
                 em.close();
             }
