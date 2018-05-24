@@ -41,8 +41,14 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             throw new ErrorAplicacion("ManejadorProductos.Buscar(:String)$Nombre del producto inválido");
         } else {
             try {
-                Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
+                Query q = getEntityManager().createNamedQuery("Producto.findByNombreIdProductoLike");
                 q.setParameter("nombre", "%" + producto + "%");
+                try {
+                    int idCategoria = Integer.parseInt(producto);
+                    q.setParameter("idCategoria", idCategoria);
+                } catch (Exception e) {
+                    q.setParameter("idCategoria", null);            
+                }
                 List lista = q.getResultList();
                 return lista;
             } catch (Exception ex) {
