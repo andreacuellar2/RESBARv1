@@ -26,11 +26,19 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @param IdCat Id de la categoria cuyos productos se quieren obtener 
      * @return Devuelve una coleccion de objetos productos que se corresponden con el identificador de categoria que se paso como parametro
      */
-    public static List<Producto> ObtenerxCategoria(int IdCat){
-        Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
-        q.setParameter("idCategoria", IdCat);
-        List lista = q.getResultList();
-        return lista;                
+    public List<Producto> ObtenerxCategoria(int IdCat) throws ErrorAplicacion {
+        if (IdCat < 0) {
+            throw new ErrorAplicacion("ManejadorProductos.ObtenerxCategoria(:int)$Id no válido");
+        } else {
+            try {
+                Query q = getEntityManager().createNamedQuery("Producto.findByIdCategoria");
+                q.setParameter("idCategoria", IdCat);
+                List lista = q.getResultList();
+                return lista;
+            } catch (Exception ex) {
+                throw new ErrorAplicacion("ManejadorProductos.ObtenerxCategoria(:int)$Fallo al obtener productos por Categoría" + ex.getMessage());
+            }
+        }
     }
     
     /**
@@ -38,11 +46,25 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @param producto Criterio de busqueda para ir a la base de datos y buscar todos los productos cuyo Id o nombre coincida con el criterio de búsqueda. 
      * @return Devuelve la coleccion de productos, sin productos duplicados.
      */
-    public static List<Producto> Buscar(String producto){
-        Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
-        q.setParameter("nombre", "%" + producto + "%");        
-        List lista = q.getResultList();
-        return lista;
+    public List<Producto> Buscar(String producto) throws ErrorAplicacion {
+        if (producto.isEmpty()) {
+            throw new ErrorAplicacion("ManejadorProductos.Buscar(:String)$Nombre del producto inválido");
+        } else {
+            try {
+                Query q = getEntityManager().createNamedQuery("Producto.findByNombreIdProductoLike");
+                q.setParameter("nombre", "%" + producto + "%");
+                try {
+                    int idCategoria = Integer.parseInt(producto);
+                    q.setParameter("idCategoria", idCategoria);
+                } catch (Exception e) {
+                    q.setParameter("idCategoria", null);            
+                }
+                List lista = q.getResultList();
+                return lista;
+            } catch (Exception ex) {
+                throw new ErrorAplicacion("ManejadorProductos.Buscar(:String)$Fallo al buscar producto" + ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -52,7 +74,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      */
     public static void Insertar(Producto producto) throws ErrorAplicacion {
         if (producto.detalleOrdenList == null) {
-            producto.detalleOrdenList =new ArrayList<DetalleOrden>();
+            producto.detalleOrdenList = new ArrayList<DetalleOrden>();
         }
         EntityManager em = null;
         try {
@@ -61,7 +83,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             em.persist(producto);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            throw new ErrorAplicacion(ex.toString());
+            throw new ErrorAplicacion("ManejadorProductos.Insertar(:Producto)$Fallo al insertar nuevo producto" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
@@ -82,11 +104,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             producto = em.merge(producto);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = producto.idProducto;
-            }
-            throw new ErrorAplicacion(ex.toString());
+            throw new ErrorAplicacion("ManejadorProductos.Actualizar(:Producto)$Fallo al actualizar producto" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
@@ -98,7 +116,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * Elimina un producto de la base de datos.
      * @param producto El producto a eliminar.
      */
-    public static void Eliminar(Producto producto) {
+    public void Eliminar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -106,6 +124,8 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             Producto produc = producto;
             em.remove(produc);
             em.getTransaction().commit();
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorProductos.Eliminar(:Producto)$Fallo al eliminar producto" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
@@ -118,29 +138,36 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @param id El id del producto que se desea obtener.
      * @return Devuelve un objeto producto cuyo ID coincide con el valor del parametro.
      */
-    public static Producto Obtener(Integer id) {
+    public Producto Obtener(Integer id) throws ErrorAplicacion {
+        if (id < 0) {
+            throw new ErrorAplicacion("ManejadorProductos.Obtener(:Integer)$Id no válido");
+        }
         EntityManager em = getEntityManager();
         try {
             return em.find(Producto.class, id);
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorProductos.Obtener(:Integer)$Fallo al obtener producto por id" + ex.getMessage());
         } finally {
             em.close();
         }
     }    
     
-    /**
+/**
      * Realiza una consulta a la base de datos para obtener el ultimo id de producto y le suma uno
      * @return Devuelve el proximo ID disponible para producto.
      */
-    public static Integer ObtenerId() {
+
+    public Integer ObtenerId() throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Producto.findAllByIdProducto");
             q.setMaxResults(1);
             return ((Integer) q.getSingleResult() + 1);
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorProductos.ObtenerId()$Fallo al obtener id del producto" + ex.getMessage());
         } finally {
             em.close();
         }
     }
-    
-    
+
 }

@@ -75,4 +75,52 @@ public class Orden implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     public List<DetalleOrden> detalleOrdenList;
    
+    /**
+     *Calcula el total de consumo de la orden.
+     */
+    public void CalcularTotal(){
+      BigDecimal totalCalculado = null;
+        for (DetalleOrden detalleOrden : detalleOrdenList) {
+            totalCalculado = totalCalculado.add(detalleOrden.cantidad.multiply(detalleOrden.producto.precio));
+        }
+      this.total = totalCalculado;
+    }
+    
+    /**
+     * Permite agregar más productos a la orden
+     * @param producto el producto a agregar a la orden.
+     * @param cant la cantidad de producto a agregar.
+     */
+    public void AgregarProducto(Producto producto, BigDecimal cant){
+        for (DetalleOrden detalleOrden : detalleOrdenList) {
+            if (producto == detalleOrden.producto) {
+               detalleOrden.cantidad = detalleOrden.cantidad.add(cant);
+            }else{
+                DetalleOrden nuevo = new DetalleOrden();
+                nuevo.producto = producto;
+                nuevo.cantidad = cant;
+                detalleOrdenList.add(nuevo);
+            }           
+        }
+        CalcularTotal();
+    }
+    
+    /**
+     * Permite eliminar productos de una orden y actualiza el total de la orden.
+     * @param producto el producto a eliminar.
+     * @param cant la cantidad de producto a eliminar.
+     */
+    public void EliminarProducto(Producto producto, BigDecimal cant){
+        for (DetalleOrden detalleOrden : detalleOrdenList) {
+            if (producto == detalleOrden.producto) {
+               detalleOrden.cantidad =  detalleOrden.cantidad.subtract(cant);
+               if(detalleOrden.cantidad.intValue()<=0){
+                detalleOrdenList.remove(detalleOrden);
+               }
+               
+            }
+        }
+        CalcularTotal();
+    }
+    
 }

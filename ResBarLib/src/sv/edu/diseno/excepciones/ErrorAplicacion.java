@@ -1,7 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ Clase para el lanzamiento de excepciones personalizadas hacia la capa superior de interfaz.
+ Hereda de la clase Exception. Solo posee un constructor el cual recibe el mensaje de error,
+ el mensaje de error usará el separador Dólar, para indicar primero el objeto y método que 
+ desencadena la excepción, y luego el propio mensaje.
  */
 package sv.edu.diseno.excepciones;
 
@@ -9,10 +10,14 @@ package sv.edu.diseno.excepciones;
  *
  * @author jcpleitez
  */
-public class ErrorAplicacion extends RuntimeException{
+public class ErrorAplicacion extends RuntimeException {
 
-    public ErrorAplicacion(String errorExecution) {
-        super(errorExecution);
+    /**
+     * @param msg mensaje de error
+     *
+     */
+    public ErrorAplicacion(String msg) {
+        super(msg);
     }
-    
+
 }

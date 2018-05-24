@@ -24,17 +24,19 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
      * Va a la base de datos y obtiene todos los parametros que están en dicha tabla.
      * @return Devuelve una coleccion de objetos parametro
      */
-    public static List<Parametro> Obtener() {
+    public static List<Parametro> Obtener() throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
             cq.select(cq.from(Parametro.class));
             Query q = em.createQuery(cq);
             return q.getResultList();
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorParametros.Obtener()$Fallo al obtener parámetros" + ex.getMessage());
         } finally {
             em.close();
         }
-    } 
+    }
 
     /**
      * Actualiza el campo valor de la tabla parametro
@@ -53,10 +55,10 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
             if (msg == null || msg.length() == 0) {
                 Integer id = parametro.idParametro;
                 if (em.find(Parametro.class, id) == null) {
-                    throw new ErrorAplicacion("El parámetro con el ID '"+id+"' ya no existe");
+                    throw new ErrorAplicacion("El parámetro con el ID '" + id + "' ya no existe");
                 }
             }
-            throw new ErrorAplicacion(ex.toString());
+            throw new ErrorAplicacion("ManejadorParametros.Actualizar(:Parametro)$Fallo al actualizar parámetros" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
@@ -69,13 +71,18 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
      * @param idParametro El id del parametro que se desea buscar.
      * @return Devuelve el parametro con el id correspondiente.
      */
-    public static Parametro Obtener(int idParametro) {
+    public static Parametro Obtener(int idParametro) throws ErrorAplicacion {
+        if (idParametro<0) {
+            throw new ErrorAplicacion("ManejadorParametros.Obtener(:int)$Fallo al obtener parámetro por id");
+        }
         EntityManager em = getEntityManager();
         try {
             return em.find(Parametro.class, idParametro);
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorParametros.Obtener(:int)$Fallo al obtener parámetro por id" + ex.getMessage());
         } finally {
             em.close();
         }
     }
-    
+
 }

@@ -21,13 +21,14 @@ import sv.edu.diseno.excepciones.ErrorAplicacion;
  */
 public class ManejadorCategorias extends EntityManagerProvider implements Serializable {
 
+
     
     /**
      * Realiza una peticion a la base de datos y devuelve una coleccion de categorias.
      * @param subProductos TRUE - Devuelve las categorias con sus productos FALSE - Devuelve las categorias sin sus productos
      * @return Devuelve una coleccion de objetos categoria.
      */
-    public static List<Categoria> Obtener(boolean subProductos) {
+    public static List<Categoria> Obtener(boolean subProductos) throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             if (subProductos) {
@@ -45,10 +46,12 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
                 }
                 return lista;
             }
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorCategorias.Obtener(:boolean)$Fallo al obtener lista de productos" + ex.getMessage());
         } finally {
             em.close();
         }
-    }    
+    }
 
     /**
      * Actualiza los campos de una categoria, exceptuando su ID.
@@ -67,14 +70,13 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
             if (msg == null || msg.length() == 0) {
                 Integer id = categoria.idCategoria;
             }
-            throw new ErrorAplicacion(ex.toString());
+            throw new ErrorAplicacion("ManejadorCategorias.Actualizar(:Categoria)$Fallo al actualizar" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
             }
         }
     }
-    
     /**
      * Agrega un nuevo objeto categoria a la base de datos.
      * @param categoria Objeto categoria a agregar a la base de datos
@@ -88,7 +90,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
             em.persist(categoria);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            throw new ErrorAplicacion(ex.toString());
+            throw new ErrorAplicacion("ManejadorCategorias.Insertar(:Categoria)$Fallo al insertar nueva categoría" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
@@ -100,8 +102,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
      * Elimina una categoria de la base de datos.
      * @param categoria La categoria a eliminar.
      */
-    public static void Eliminar(Categoria categoria) {
-
+    public static void Eliminar(Categoria categoria) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -109,6 +110,8 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
             Categoria cat = categoria;
             em.remove(cat);
             em.getTransaction().commit();
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorCategorias.Eliminar(:Categoria)$Fallo al eliminar categoría" + ex.getMessage());
         } finally {
             if (em != null) {
                 em.close();
@@ -120,12 +123,14 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
      * Realiza una consulta a la base de datos para obtener el ultimo id de categoria y le suma uno
      * @return Devuelve el proximo ID disponible para categoria.
      */
-    public Integer ObtenerId() {
+    public Integer ObtenerId() throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Categoria.findAllByIdCategoria");
             q.setMaxResults(1);
             return ((Integer) q.getSingleResult() + 1);
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("ManejadorCategorias.ObtenerId()$Fallo al obtener id de la categoría" + ex.getMessage());
         } finally {
             em.close();
         }
