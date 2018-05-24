@@ -35,7 +35,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
                 Query q = em.createQuery(cq);
                 List<Categoria> lista = q.getResultList();
                 for (Categoria categoria : lista) {
-                    categoria.setProductoList(new ArrayList<>());
+                    categoria.productoList = new ArrayList<>();
                 }
                 return lista;
             }
@@ -54,7 +54,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = categoria.getIdCategoria();
+                Integer id = categoria.idCategoria;
             }
             throw new ErrorAplicacion(ex.toString());
         } finally {

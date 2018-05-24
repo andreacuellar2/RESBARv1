@@ -36,8 +36,8 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
     }
 
     public void Insertar(Producto producto) throws ErrorAplicacion {
-        if (producto.getDetalleOrdenList() == null) {
-            producto.setDetalleOrdenList(new ArrayList<DetalleOrden>());
+        if (producto.detalleOrdenList == null) {
+            producto.detalleOrdenList =new ArrayList<DetalleOrden>();
         }
         EntityManager em = null;
         try {
@@ -46,7 +46,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
             em.persist(producto);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            if (Obtener(producto.getIdProducto()) != null) {
+            if (Obtener(producto.idProducto) != null) {
                 throw new ErrorAplicacion("El produto '"+producto+"' ya existe"+ex);
             }
             throw new ErrorAplicacion(ex.toString());
@@ -66,7 +66,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = producto.getIdProducto();
+                Integer id = producto.idProducto;
                 if (Obtener(id) == null) {
                     throw new ErrorAplicacion("El producto con el ID '"+ id + "' ya no existe");
                 }

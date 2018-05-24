@@ -33,74 +33,12 @@ public class Parametro implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "idParametro")
-    private Integer idParametro;
+    public Integer idParametro;
     @Basic(optional = false)
     @Column(name = "nombre")
-    private String nombre;
+    public String nombre;
     @Basic(optional = false)
     @Column(name = "valor")
-    private String valor;
-
-    public Parametro() {
-    }
-
-    public Parametro(Integer idParametro) {
-        this.idParametro = idParametro;
-    }
-
-    public Parametro(Integer idParametro, String nombre, String valor) {
-        this.idParametro = idParametro;
-        this.nombre = nombre;
-        this.valor = valor;
-    }
-
-    public Integer getIdParametro() {
-        return idParametro;
-    }
-
-    public void setIdParametro(Integer idParametro) {
-        this.idParametro = idParametro;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getValor() {
-        return valor;
-    }
-
-    public void setValor(String valor) {
-        this.valor = valor;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idParametro != null ? idParametro.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Parametro)) {
-            return false;
-        }
-        Parametro other = (Parametro) object;
-        if ((this.idParametro == null && other.idParametro != null) || (this.idParametro != null && !this.idParametro.equals(other.idParametro))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "sv.edu.diseno.definiciones.Parametro[ idParametro=" + idParametro + " ]";
-    }
+    public String valor;
     
 }

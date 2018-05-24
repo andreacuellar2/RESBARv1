@@ -42,7 +42,7 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = parametro.getIdParametro();
+                Integer id = parametro.idParametro;
                 if (em.find(Parametro.class, id) == null) {
                     throw new ErrorAplicacion("El parámetro con el ID '"+id+"' ya no existe");
                 }
