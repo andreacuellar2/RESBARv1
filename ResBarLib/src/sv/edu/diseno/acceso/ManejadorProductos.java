@@ -54,10 +54,10 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
                 Query q = getEntityManager().createNamedQuery("Producto.findByNombreLike");
                 q.setParameter("nombre", "%" + producto + "%");
                 try {
-                    int idCategoria = Integer.parseInt(producto);
-                    q.setParameter("idCategoria", idCategoria);
+                    int idProducto = Integer.parseInt(producto);
+                    q.setParameter("idProducto", idProducto);
                 } catch (Exception e) {
-                    q.setParameter("idCategoria", null);            
+                    q.setParameter("idProducto", null);            
                 }
                 List lista = q.getResultList();
                 return lista;
