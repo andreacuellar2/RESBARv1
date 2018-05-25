@@ -75,9 +75,6 @@ public class Orden implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     public List<DetalleOrden> detalleOrdenList;
    
-    /**
-     *Calcula el total de consumo de la orden.
-     */
     public void CalcularTotal(){
       BigDecimal totalCalculado = null;
         for (DetalleOrden detalleOrden : detalleOrdenList) {
@@ -86,11 +83,6 @@ public class Orden implements Serializable {
       this.total = totalCalculado;
     }
     
-    /**
-     * Permite agregar más productos a la orden
-     * @param producto el producto a agregar a la orden.
-     * @param cant la cantidad de producto a agregar.
-     */
     public void AgregarProducto(Producto producto, BigDecimal cant){
         for (DetalleOrden detalleOrden : detalleOrdenList) {
             if (producto == detalleOrden.producto) {
@@ -105,11 +97,6 @@ public class Orden implements Serializable {
         CalcularTotal();
     }
     
-    /**
-     * Permite eliminar productos de una orden y actualiza el total de la orden.
-     * @param producto el producto a eliminar.
-     * @param cant la cantidad de producto a eliminar.
-     */
     public void EliminarProducto(Producto producto, BigDecimal cant){
         for (DetalleOrden detalleOrden : detalleOrdenList) {
             if (producto == detalleOrden.producto) {

@@ -41,11 +41,7 @@ public class Categoria implements Serializable {
     @Basic(optional = false)
     @Column(name = "nombre")
     public String nombre;
-    
-    /**
-     * La propiedad productos tendrá una colección de objetos de la clase producto
-     */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "categoria")
-    public List<Producto> productos;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCategoria")
+    public List<Producto> productoList;
     
 }

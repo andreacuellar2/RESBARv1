@@ -13,8 +13,8 @@ package sv.edu.diseno.excepciones;
 public class ErrorAplicacion extends RuntimeException {
 
     /**
-     * Genera un mensaje de error
      * @param msg mensaje de error
+     *
      */
     public ErrorAplicacion(String msg) {
         super(msg);

@@ -42,7 +42,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
                 Query q = em.createQuery(cq);
                 List<Categoria> lista = q.getResultList();
                 for (Categoria categoria : lista) {
-                    categoria.productos = new ArrayList<>();
+                    categoria.productoList = new ArrayList<>();
                 }
                 return lista;
             }
@@ -123,7 +123,7 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
      * Realiza una consulta a la base de datos para obtener el ultimo id de categoria y le suma uno
      * @return Devuelve el proximo ID disponible para categoria.
      */
-    public Integer ObtenerId() throws ErrorAplicacion {
+    public static Integer ObtenerId() throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Categoria.findAllByIdCategoria");
@@ -134,6 +134,4 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         } finally {
             em.close();
         }
-    }
-
-}
+    }}

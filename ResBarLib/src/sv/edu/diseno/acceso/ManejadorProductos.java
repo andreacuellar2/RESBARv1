@@ -26,7 +26,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @param IdCat Id de la categoria cuyos productos se quieren obtener 
      * @return Devuelve una coleccion de objetos productos que se corresponden con el identificador de categoria que se paso como parametro
      */
-    public List<Producto> ObtenerxCategoria(int IdCat) throws ErrorAplicacion {
+    public static List<Producto> ObtenerxCategoria(int IdCat) throws ErrorAplicacion {
         if (IdCat < 0) {
             throw new ErrorAplicacion("ManejadorProductos.ObtenerxCategoria(:int)$Id no válido");
         } else {
@@ -46,7 +46,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @param producto Criterio de busqueda para ir a la base de datos y buscar todos los productos cuyo Id o nombre coincida con el criterio de búsqueda. 
      * @return Devuelve la coleccion de productos, sin productos duplicados.
      */
-    public List<Producto> Buscar(String producto) throws ErrorAplicacion {
+    public static List<Producto> Buscar(String producto) throws ErrorAplicacion {
         if (producto.isEmpty()) {
             throw new ErrorAplicacion("ManejadorProductos.Buscar(:String)$Nombre del producto inválido");
         } else {
