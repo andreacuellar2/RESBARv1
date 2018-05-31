@@ -99,10 +99,15 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
     public static void Actualizar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
+            if(!(producto.idProducto<=0)){
             em = getEntityManager();
             em.getTransaction().begin();
             producto = em.merge(producto);
             em.getTransaction().commit();
+            }else{
+                throw new ErrorAplicacion("ManejadorProductos.Actualizar(:Producto)$Fallo al actualizar producto");
+            }
+            
         } catch (Exception ex) {
             throw new ErrorAplicacion("ManejadorProductos.Actualizar(:Producto)$Fallo al actualizar producto" + ex.getMessage());
         } finally {
@@ -119,6 +124,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
     public void Eliminar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
+            //FALTA VALIDAR PARAMETRO INVALIDO
             em = getEntityManager();
             em.getTransaction().begin();
             Producto produc = producto;
