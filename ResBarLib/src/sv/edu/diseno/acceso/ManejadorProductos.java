@@ -124,12 +124,20 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
     public void Eliminar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
-            //FALTA VALIDAR PARAMETRO INVALIDO
-            em = getEntityManager();
-            em.getTransaction().begin();
-            Producto produc = producto;
-            em.remove(produc);
-            em.getTransaction().commit();
+            Producto proFind = Obtener(producto.idProducto);
+            System.out.println(proFind);
+            if(proFind.nombre.equals(producto.nombre)){
+                em = getEntityManager();
+                em.getTransaction().begin();
+                if (!em.contains(producto)) {
+                producto = em.merge(producto);
+                }
+                em.remove(producto);
+                em.getTransaction().commit();
+            }else{
+                throw new ErrorAplicacion("ManejadorProductos.Eliminar(:Producto)$Fallo al eliminar producto" );
+            }
+            
         } catch (Exception ex) {
             throw new ErrorAplicacion("ManejadorProductos.Eliminar(:Producto)$Fallo al eliminar producto" + ex.getMessage());
         } finally {
