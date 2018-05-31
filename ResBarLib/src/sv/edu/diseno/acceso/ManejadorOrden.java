@@ -64,13 +64,13 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         EntityManager em = null;
         try {
             
-            if(!orden.detalleOrdenList.isEmpty() && orden.total.compareTo(BigDecimal.ZERO) == 1 ){
+            if(orden.idOrden > 0){
             em = getEntityManager();
             em.getTransaction().begin();
-            orden = em.merge(orden);
+            orden = em.merge(orden);            
             em.getTransaction().commit();    
             }else{
-               //excepcion de que no tiene productos o el total no es mayor que 0
+               throw new ErrorAplicacion("Parametro invalido id" + orden.idOrden);
             }
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -129,17 +129,15 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         EntityManager em = null;
         try {
             
-            if(orden.mesa.isEmpty() && orden.mesero.isEmpty() && orden.cliente.isEmpty()){
-                //Excepcion de que al menos uno de esos es requerido.
+            if(orden.mesa.isEmpty() && orden.mesero.isEmpty() && orden.cliente.isEmpty() && orden.idOrden > 0){
+                throw new ErrorAplicacion("Orden Parametros incompletos o idOrden negativo&");
             }else if(orden.total.compareTo(BigDecimal.ZERO) != 1){
-                //Excepcion de total negativo o 0.
-            }else if(orden.detalleOrdenList.isEmpty()){
-                //Excepcion de orden sin productos.
-            }else{
-            em = getEntityManager();
-            em.getTransaction().begin();
-            em.persist(orden);
-            em.getTransaction().commit();
+                throw new ErrorAplicacion("Orden Error en el total del dinero&");
+            }else{                
+                em = getEntityManager();
+                em.getTransaction().begin();
+                em.persist(orden);
+                em.getTransaction().commit();
             }
         } catch (Exception ex) {
             Orden findOrden = null;
@@ -168,8 +166,10 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Orden or = orden;
-            em.remove(or);
+            if (!em.contains(orden)) {
+                orden = em.merge(orden);
+            }
+            em.remove(orden);
             em.getTransaction().commit();
         } catch (Exception ex) {
             throw new ErrorAplicacion("ManejadorOrden.Eliminar(:Orden)$Fallo al eliminar orden" + ex.getMessage());
