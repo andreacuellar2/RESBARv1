@@ -9,18 +9,24 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import sv.edu.diseno.excepciones.ErrorAplicacion;
+import sv.edu.diseno.provider.EntityManagerProvider;
 
 /**
  *
@@ -36,11 +42,14 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Orden.findAllActivasByIdOrden", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")    
     , @NamedQuery(name = "Orden.findByFechaBetWeen", query = "SELECT o FROM Orden o WHERE o.fecha BETWEEN :fecha1 AND :fecha2")
     , @NamedQuery(name = "Orden.findByIdOrden", query = "SELECT o FROM Orden o WHERE o.idOrden = :idOrden")
+    ,  @NamedQuery(name = "Orden.updateDetalleOrden", query = "UPDATE DetalleOrden do SET do.cantidad = :cantidad WHERE do.orden.idOrden = :idOrden AND do.producto.idProducto = :idProducto")
+    , @NamedQuery(name = "Orden.deleteDetalleOrden", query = "DELETE FROM DetalleOrden do WHERE do.orden.idOrden = :idOrden AND do.producto.idProducto = :idProducto")
     , @NamedQuery(name = "Orden.findByMesero", query = "SELECT o FROM Orden o WHERE o.mesero = :mesero")
     , @NamedQuery(name = "Orden.findByMesa", query = "SELECT o FROM Orden o WHERE o.mesa = :mesa")
     , @NamedQuery(name = "Orden.findByCliente", query = "SELECT o FROM Orden o WHERE o.cliente = :cliente")
-    , @NamedQuery(name = "Orden.findByFecha", query = "SELECT o FROM Orden o WHERE o.fecha = :fecha")
+    , @NamedQuery(name = "Orden.findByFupdateDetalleOrdenecha", query = "SELECT o FROM Orden o WHERE o.fecha = :fecha")
     , @NamedQuery(name = "Orden.findByComentario", query = "SELECT o FROM Orden o WHERE o.comentario = :comentario")
+    , @NamedQuery(name = "Orden.calcularTotal", query = "SELECT SUM (p.precio*do.cantidad) FROM DetalleOrden do INNER JOIN do.producto p WHERE do.orden.idOrden = :idOrden ")   
     , @NamedQuery(name = "Orden.findByTotal", query = "SELECT o FROM Orden o WHERE o.total = :total")
     , @NamedQuery(name = "Orden.findByActiva", query = "SELECT o FROM Orden o WHERE o.activa = :activa")})
 public class Orden implements Serializable {
@@ -75,39 +84,116 @@ public class Orden implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     public List<DetalleOrden> detalleOrdenList;
    
-    public void CalcularTotal(){
-      BigDecimal totalCalculado = null;
-        for (DetalleOrden detalleOrden : detalleOrdenList) {
-            totalCalculado = totalCalculado.add(detalleOrden.cantidad.multiply(detalleOrden.producto.precio));
-        }
-      this.total = totalCalculado;
-    }
-    
-    public void AgregarProducto(Producto producto, BigDecimal cant){
-        for (DetalleOrden detalleOrden : detalleOrdenList) {
-            if (producto == detalleOrden.producto) {
-               detalleOrden.cantidad = detalleOrden.cantidad.add(cant);
-            }else{
-                DetalleOrden nuevo = new DetalleOrden();
-                nuevo.producto = producto;
-                nuevo.cantidad = cant;
-                detalleOrdenList.add(nuevo);
-            }           
-        }
-        CalcularTotal();
-    }
-    
-    public void EliminarProducto(Producto producto, BigDecimal cant){
-        for (DetalleOrden detalleOrden : detalleOrdenList) {
-            if (producto == detalleOrden.producto) {
-               detalleOrden.cantidad =  detalleOrden.cantidad.subtract(cant);
-               if(detalleOrden.cantidad.intValue()<=0){
-                detalleOrdenList.remove(detalleOrden);
-               }
-               
+/**
+     * Método: CalcularTotal() Almacena el total de consumo de la orden, para
+     * ello recorre toda su colección DETALLE multiplicando el precio unitario
+     * por la cantidad y luego sumándolo para al final actualizar la propiedad
+     * total de la orden con el valor correcto.
+     */
+    public void CalcularTotal() {
+        EntityManager eml = EntityManagerProvider.getEntityManager();
+        try {
+            Query q = eml.createNamedQuery("Orden.calcularTotal");
+            q.setParameter("idOrden", this.idOrden);
+            this.total = (BigDecimal) q.getSingleResult();
+
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("Orden.CalcularTotal()$Error al calcular el total de la orden"+ ex.getMessage());
+        } finally {
+            if (eml.isOpen()) {
+                eml.close();
             }
         }
-        CalcularTotal();
+    }
+
+    /**
+     * Método: AgregarProducto(:producto,cant:double) Permite agregar más
+     * productos a la orden, toma el objeto producto y la cantidad para
+     * construir un objeto DetalleOrden, y luego ver si ese producto ya está
+     * agregado a la orden, si ya está agregado a la orden, entonces solo se
+     * suma la cantidad, sino se agrega a la colección DETALLE de la orden y se
+     * invoca calcular total.
+     */
+    public void AgregarProducto(Producto producto, double cant) {
+
+        if (cant <= 0) {
+            throw new ErrorAplicacion("Orden.AgregarProducto()$La cantidad debe ser mayor a cero");
+        }
+
+        EntityManager eml = EntityManagerProvider.getEntityManager();
+
+        DetalleOrden detalleOrden = new DetalleOrden();
+        detalleOrden.cantidad = new BigDecimal(cant);
+
+        DetalleOrdenPK detalleOrdenPK = new DetalleOrdenPK();
+        detalleOrdenPK.idOrden = this.idOrden;
+        detalleOrdenPK.idProducto = producto.idProducto;
+
+        detalleOrden.detalleOrdenPK = detalleOrdenPK;
+
+        boolean encontrado = false;
+
+        for (DetalleOrden d : this.detalleOrdenList) {
+            if (Objects.equals(d.producto.idProducto, detalleOrden.producto.idProducto)) {
+                encontrado = true;
+                d.cantidad.add(new BigDecimal(cant));
+            }
+        }
+
+        if (!encontrado) {
+            this.detalleOrdenList.add(detalleOrden);
+        }
+
+        EntityTransaction et = eml.getTransaction();
+        try {
+            if (!et.isActive()) {
+                et.begin();
+            }
+            eml.merge(this);
+            et.commit();
+            this.CalcularTotal();
+        } catch (Exception ex) {
+            if (et.isActive()) {
+                et.rollback();
+            }
+            throw new ErrorAplicacion("Orden.AgregarProducto()$Algo fallo intentando agregar un nuevo producto");
+        } finally {
+            if (eml.isOpen()) {
+                eml.close();
+                this.CalcularTotal();
+            }
+        }
+    }
+
+    /**
+     * Método: EliminarProducto(:producto,cant:double) Permite eliminar
+     * productos de una orden y actualiza el total de la orden.
+     */
+    public void EliminarProducto(Producto producto, double cant) {
+        if (cant < 0) {
+            throw new ErrorAplicacion("Orden.EliminarProducto()$La cantidad debe ser mayor a cero");
+        }
+        
+        EntityManager eml = EntityManagerProvider.getEntityManager();
+        try {
+            if (cant > 0) {
+                Query q = eml.createNamedQuery("Orden.updateDetalleOrden");
+                q.setParameter("idOrden", this.idOrden);
+                q.setParameter("idProducto", producto.idProducto);
+                q.setParameter("cantidad", cant);
+            } else if (cant == 0) {
+                Query q = eml.createNamedQuery("Orden.deleteDetalleOrden");
+                q.setParameter("idOrden", this.idOrden);
+                q.setParameter("idProducto", producto.idProducto);
+            }
+        } catch (Exception ex) {
+            throw new ErrorAplicacion("Orden.EliminarProducto()$Error al eliminar productos de la orden");
+        } finally {
+            if (eml.isOpen()) {
+                eml.close();
+                this.CalcularTotal();
+            }
+        }
     }
     
 }

@@ -51,13 +51,6 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
             parametro = em.merge(parametro);
             em.getTransaction().commit();
         } catch (Exception ex) {
-            String msg = ex.getLocalizedMessage();
-            if (msg == null || msg.length() == 0) {
-                Integer id = parametro.idParametro;
-                if (em.find(Parametro.class, id) == null) {
-                    throw new ErrorAplicacion("El parámetro con el ID '" + id + "' ya no existe");
-                }
-            }
             throw new ErrorAplicacion("ManejadorParametros.Actualizar(:Parametro)$Fallo al actualizar parámetros" + ex.getMessage());
         } finally {
             if (em != null) {
@@ -73,7 +66,7 @@ public class ManejadorParametros extends EntityManagerProvider implements Serial
      */
     public static Parametro Obtener(int idParametro) throws ErrorAplicacion {
         if (idParametro<0) {
-            throw new ErrorAplicacion("ManejadorParametros.Obtener(:int)$Fallo al obtener parámetro por id");
+            throw new ErrorAplicacion("ManejadorParametros.Obtener(:int)$Fallo al obtener parámetro por id$ID invalido");
         }
         EntityManager em = getEntityManager();
         try {
