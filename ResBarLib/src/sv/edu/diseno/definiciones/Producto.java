@@ -20,6 +20,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -60,5 +61,93 @@ public class Producto implements Serializable {
     @JoinColumn(name = "idCategoria", referencedColumnName = "idCategoria")
     @ManyToOne(optional = false)
     public Categoria idCategoria;
+
+    public Producto() {
+    }
+
+    public Producto(Integer idProducto) {
+        this.idProducto = idProducto;
+    }
+
+    public Producto(Integer idProducto, String nombre, BigDecimal precio, Character area) {
+        this.idProducto = idProducto;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.area = area;
+    }
+
+    public Integer getIdProducto() {
+        return idProducto;
+    }
+
+    public void setIdProducto(Integer idProducto) {
+        this.idProducto = idProducto;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public BigDecimal getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(BigDecimal precio) {
+        this.precio = precio;
+    }
+
+    public Character getArea() {
+        return area;
+    }
+
+    public void setArea(Character area) {
+        this.area = area;
+    }
+
+    @XmlTransient
+    public List<DetalleOrden> getDetalleOrdenList() {
+        return detalleOrdenList;
+    }
+
+    public void setDetalleOrdenList(List<DetalleOrden> detalleOrdenList) {
+        this.detalleOrdenList = detalleOrdenList;
+    }
+
+    public Categoria getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(Categoria idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (idProducto != null ? idProducto.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Producto)) {
+            return false;
+        }
+        Producto other = (Producto) object;
+        if ((this.idProducto == null && other.idProducto != null) || (this.idProducto != null && !this.idProducto.equals(other.idProducto))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "sv.edu.diseno.definiciones.Producto[ idProducto=" + idProducto + " ]";
+    }
     
 }

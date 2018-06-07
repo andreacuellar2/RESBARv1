@@ -46,4 +46,77 @@ public class DetalleOrden implements Serializable {
     @ManyToOne(optional = false)
     public Producto producto;
     
+    public DetalleOrden() {
+    }
+
+    public DetalleOrden(DetalleOrdenPK detalleOrdenPK) {
+        this.detalleOrdenPK = detalleOrdenPK;
+    }
+
+    public DetalleOrden(DetalleOrdenPK detalleOrdenPK, BigDecimal cantidad) {
+        this.detalleOrdenPK = detalleOrdenPK;
+        this.cantidad = cantidad;
+    }
+
+    public DetalleOrden(int idOrden, int idProducto) {
+        this.detalleOrdenPK = new DetalleOrdenPK(idOrden, idProducto);
+    }
+
+    public DetalleOrdenPK getDetalleOrdenPK() {
+        return detalleOrdenPK;
+    }
+
+    public void setDetalleOrdenPK(DetalleOrdenPK detalleOrdenPK) {
+        this.detalleOrdenPK = detalleOrdenPK;
+    }
+
+    public BigDecimal getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(BigDecimal cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Orden getOrden() {
+        return orden;
+    }
+
+    public void setOrden(Orden orden) {
+        this.orden = orden;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (detalleOrdenPK != null ? detalleOrdenPK.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof DetalleOrden)) {
+            return false;
+        }
+        DetalleOrden other = (DetalleOrden) object;
+        if ((this.detalleOrdenPK == null && other.detalleOrdenPK != null) || (this.detalleOrdenPK != null && !this.detalleOrdenPK.equals(other.detalleOrdenPK))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "sv.edu.diseno.definiciones.DetalleOrden[ detalleOrdenPK=" + detalleOrdenPK + " ]";
+    }
+    
 }
