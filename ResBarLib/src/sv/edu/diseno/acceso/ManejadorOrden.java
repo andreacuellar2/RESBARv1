@@ -131,8 +131,6 @@ public class ManejadorOrden extends EntityManagerProvider implements Serializabl
             
             if(orden.mesa.isEmpty() && orden.mesero.isEmpty() && orden.cliente.isEmpty() && orden.idOrden > 0){
                 throw new ErrorAplicacion("Orden Parametros incompletos o idOrden negativo&");
-            }else if(orden.total.compareTo(BigDecimal.ZERO) != 1){
-                throw new ErrorAplicacion("Orden Error en el total del dinero&");
             }else{                
                 em = getEntityManager();
                 em.getTransaction().begin();
