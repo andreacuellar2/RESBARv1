@@ -107,8 +107,10 @@ public class ManejadorCategorias extends EntityManagerProvider implements Serial
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Categoria cat = categoria;
-            em.remove(cat);
+            if (!em.contains(categoria)) {
+                categoria = em.merge(categoria);
+            }
+            em.remove(categoria);
             em.getTransaction().commit();
         } catch (Exception ex) {
             throw new ErrorAplicacion("ManejadorCategorias.Eliminar(:Categoria)$Fallo al eliminar categoría" + ex.getMessage());
