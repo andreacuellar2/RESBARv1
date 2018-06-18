@@ -121,7 +121,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * Elimina un producto de la base de datos.
      * @param producto El producto a eliminar.
      */
-    public void Eliminar(Producto producto) throws ErrorAplicacion {
+    public static void Eliminar(Producto producto) throws ErrorAplicacion {
         EntityManager em = null;
         try {
             Producto proFind = Obtener(producto.idProducto);
@@ -152,7 +152,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @param id El id del producto que se desea obtener.
      * @return Devuelve un objeto producto cuyo ID coincide con el valor del parametro.
      */
-    public Producto Obtener(Integer id) throws ErrorAplicacion {
+    public static Producto Obtener(Integer id) throws ErrorAplicacion {
         if (id < 0) {
             throw new ErrorAplicacion("ManejadorProductos.Obtener(:Integer)$Id no válido");
         }
@@ -171,7 +171,7 @@ public class ManejadorProductos extends EntityManagerProvider implements Seriali
      * @return Devuelve el proximo ID disponible para producto.
      */
 
-    public Integer ObtenerId() throws ErrorAplicacion {
+    public static Integer ObtenerId() throws ErrorAplicacion {
         EntityManager em = getEntityManager();
         try {
             Query q = em.createNamedQuery("Producto.findAllByIdProducto");
