@@ -40,7 +40,7 @@ import sv.edu.diseno.provider.EntityManagerProvider;
     @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o")
     , @NamedQuery(name = "Orden.findAllActivas", query = "SELECT o FROM Orden o WHERE o.activa = TRUE")
     , @NamedQuery(name = "Orden.findAllActivasText", query = "SELECT o FROM Orden o WHERE (o.activa = TRUE) AND (o.cliente LIKE :cliente OR o.mesero LIKE :mesero OR o.mesa LIKE :mesa OR o.comentario LIKE :comentario)")
-    , @NamedQuery(name = "Orden.findAllActivasByIdOrden", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")    
+    , @NamedQuery(name = "Orden.findAllActivasByIdOrden", query = "SELECT o.idOrden FROM Orden o ORDER BY o.idOrden DESC")
     , @NamedQuery(name = "Orden.findByFechaBetWeen", query = "SELECT o FROM Orden o WHERE o.fecha BETWEEN :fecha1 AND :fecha2")
     , @NamedQuery(name = "Orden.findByIdOrden", query = "SELECT o FROM Orden o WHERE o.idOrden = :idOrden")
     ,  @NamedQuery(name = "Orden.updateDetalleOrden", query = "UPDATE DetalleOrden do SET do.cantidad = :cantidad WHERE do.orden.idOrden = :idOrden AND do.producto.idProducto = :idProducto")
@@ -50,7 +50,7 @@ import sv.edu.diseno.provider.EntityManagerProvider;
     , @NamedQuery(name = "Orden.findByCliente", query = "SELECT o FROM Orden o WHERE o.cliente = :cliente")
     , @NamedQuery(name = "Orden.findByFupdateDetalleOrdenecha", query = "SELECT o FROM Orden o WHERE o.fecha = :fecha")
     , @NamedQuery(name = "Orden.findByComentario", query = "SELECT o FROM Orden o WHERE o.comentario = :comentario")
-    , @NamedQuery(name = "Orden.calcularTotal", query = "SELECT SUM (p.precio*do.cantidad) FROM DetalleOrden do INNER JOIN do.producto p WHERE do.orden.idOrden = :idOrden ")   
+    , @NamedQuery(name = "Orden.calcularTotal", query = "SELECT SUM (p.precio*do.cantidad) FROM DetalleOrden do INNER JOIN do.producto p WHERE do.orden.idOrden = :idOrden ")
     , @NamedQuery(name = "Orden.findByTotal", query = "SELECT o FROM Orden o WHERE o.total = :total")
     , @NamedQuery(name = "Orden.findByActiva", query = "SELECT o FROM Orden o WHERE o.activa = :activa")})
 public class Orden implements Serializable {
@@ -84,26 +84,25 @@ public class Orden implements Serializable {
     public boolean activa;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
     public List<DetalleOrden> detalleOrdenList;
-   
-/**
+
+    /**
      * Método: CalcularTotal() Almacena el total de consumo de la orden, para
      * ello recorre toda su colección DETALLE multiplicando el precio unitario
      * por la cantidad y luego sumándolo para al final actualizar la propiedad
      * total de la orden con el valor correcto.
      */
     public void CalcularTotal() {
-        EntityManager eml = EntityManagerProvider.getEntityManager();
-        try {
-            Query q = eml.createNamedQuery("Orden.calcularTotal");
-            q.setParameter("idOrden", this.idOrden);
-            this.total = (BigDecimal) q.getSingleResult();
-
-        } catch (Exception ex) {
-            throw new ErrorAplicacion("Orden.CalcularTotal()$Error al calcular el total de la orden"+ ex.getMessage());
-        } finally {
-            if (eml.isOpen()) {
-                eml.close();
+        if (!detalleOrdenList.isEmpty()) {
+            double nuevoTotal = 0.0;
+            total = new BigDecimal(0);//vaciar el total para recalcularlo            
+            for (DetalleOrden detalleOrden : detalleOrdenList) {
+                double precio = detalleOrden.getProducto().getPrecio().doubleValue();
+                double calculo = precio*detalleOrden.getCantidad().intValue();
+                nuevoTotal += calculo;
             }
+            total = new BigDecimal(nuevoTotal);
+        }else{
+            total = new BigDecimal(0.0);
         }
     }
 
@@ -174,7 +173,7 @@ public class Orden implements Serializable {
         if (cant < 0) {
             throw new ErrorAplicacion("Orden.EliminarProducto()$La cantidad debe ser mayor a cero");
         }
-        
+
         EntityManager eml = EntityManagerProvider.getEntityManager();
         try {
             if (cant > 0) {
@@ -311,5 +310,5 @@ public class Orden implements Serializable {
     public String toString() {
         return "sv.edu.diseno.definiciones.Orden[ idOrden=" + idOrden + " ]";
     }
-    
+
 }
