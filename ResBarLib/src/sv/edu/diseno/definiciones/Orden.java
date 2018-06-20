@@ -92,17 +92,21 @@ public class Orden implements Serializable {
      * total de la orden con el valor correcto.
      */
     public void CalcularTotal() {
-        if (!detalleOrdenList.isEmpty()) {
-            double nuevoTotal = 0.0;
-            total = new BigDecimal(0);//vaciar el total para recalcularlo            
-            for (DetalleOrden detalleOrden : detalleOrdenList) {
-                double precio = detalleOrden.getProducto().getPrecio().doubleValue();
-                double calculo = precio*detalleOrden.getCantidad().intValue();
-                nuevoTotal += calculo;
+        if (detalleOrdenList != null) {
+            if (!detalleOrdenList.isEmpty()) {
+                double nuevoTotal = 0.0;
+                total = new BigDecimal(0);//vaciar el total para recalcularlo            
+                for (DetalleOrden detalleOrden : detalleOrdenList) {
+                    double precio = detalleOrden.getProducto().getPrecio().doubleValue();
+                    double calculo = precio * detalleOrden.getCantidad().intValue();
+                    nuevoTotal += calculo;
+                }
+                total = new BigDecimal(nuevoTotal);
+            }else{
+                total = new BigDecimal(0.0);
             }
-            total = new BigDecimal(nuevoTotal);
         }else{
-            total = new BigDecimal(0.0);
+            total = new BigDecimal(0.0);            
         }
     }
 
@@ -262,6 +266,7 @@ public class Orden implements Serializable {
     }
 
     public BigDecimal getTotal() {
+        CalcularTotal();
         return total;
     }
 
